@@ -1,0 +1,36 @@
+void main(){
+  x = 6;
+  if ( y = 5){
+    y = 6;
+    x = 5;
+  }else if(x = 5)
+    y = 7;
+  else{
+    y = 50;
+  }
+
+  y = 23;
+  return;
+}
+
+int anotherFunction(){
+  return 1;
+}
+
+float a(){
+  int ss=9000;
+  return main(x);
+}
+dvec3 b(int xy,vec3 ab, mat4x2 koko){
+
+  return a();
+}
+
+ivec2 c(){
+  return (1);
+}
+
+mat3x2 d(){
+  x = 5;
+  return x;
+}
