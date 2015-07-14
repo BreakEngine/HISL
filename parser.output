@@ -1,0 +1,1375 @@
+Terminals unused in grammar
+
+   BOOLCONST
+   NONE
+   NOT
+   INC
+   DEC
+   PLUS_EQL
+   MINUS_EQL
+   MULTIPLY_EQL
+   DEVIDE_EQL
+   DOT
+
+
+State 44 conflicts: 1 reduce/reduce
+State 52 conflicts: 4 shift/reduce
+State 55 conflicts: 4 shift/reduce
+State 66 conflicts: 1 reduce/reduce
+State 69 conflicts: 1 shift/reduce
+State 70 conflicts: 1 shift/reduce
+
+
+Grammar
+
+    0 $accept: program $end
+
+    1 program: stmts
+
+    2 stmt: func_dcl
+    3     | expr_stmt
+    4     | jump_stmt
+    5     | var_dcl SEMICOLON
+    6     | multi_var_dcl SEMICOLON
+    7     | selection_stmt
+    8     | loop_stmt
+
+    9 selection_stmt: if_stmt
+
+   10 loop_stmt: while_stmt
+
+   11 if_stmt: IF OPEN_BRACE expr CLOSE_BRACE block ELSE block
+   12        | IF OPEN_BRACE expr CLOSE_BRACE block ELSE stmt
+   13        | IF OPEN_BRACE expr CLOSE_BRACE stmt ELSE stmt
+   14        | IF OPEN_BRACE expr CLOSE_BRACE stmt ELSE block
+   15        | IF OPEN_BRACE expr CLOSE_BRACE stmt
+   16        | IF OPEN_BRACE expr CLOSE_BRACE block
+
+   17 while_stmt: WHILE OPEN_BRACE expr CLOSE_BRACE block
+   18           | WHILE OPEN_BRACE expr CLOSE_BRACE stmt
+
+   19 stmts: stmt
+   20      | stmts stmt
+
+   21 expr_stmt: expr SEMICOLON
+
+   22 func_dcl: type ident OPEN_BRACE func_dcl_args CLOSE_BRACE block
+
+   23 block: OPEN_CBRACE stmts CLOSE_CBRACE
+   24      | OPEN_CBRACE CLOSE_CBRACE
+
+   25 numeric: numFloat
+   26        | numInteger
+
+   27 numFloat: FLOAT
+
+   28 numInteger: INT
+
+   29 expr: assignment
+   30     | func_call
+   31     | ident
+   32     | expr binary_op expr
+   33     | numeric
+   34     | OPEN_BRACE expr CLOSE_BRACE
+
+   35 func_call: ident OPEN_BRACE call_args CLOSE_BRACE
+
+   36 jump_stmt: RETURN SEMICOLON
+   37          | RETURN expr SEMICOLON
+
+   38 ident: ID
+
+   39 type: TYPE
+
+   40 binary_op: PLUS
+   41          | MINUS
+   42          | MULTIPLY
+   43          | DEVIDE
+
+   44 assignment: ident EQL expr
+
+   45 call_args: /* empty */
+   46          | expr
+   47          | call_args COMMA expr
+
+   48 func_dcl_args: /* empty */
+   49              | var_dcl
+   50              | func_dcl_args COMMA var_dcl
+
+   51 var_dcl: type ident
+   52        | type ident EQL expr
+
+   53 multi_var_dcl: type ident
+   54              | type ident EQL expr
+   55              | multi_var_dcl COMMA ident
+   56              | multi_var_dcl COMMA ident EQL expr
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+error (256)
+ID (258) 38
+TYPE (259) 39
+RETURN (260) 36 37
+FLOAT (261) 27
+INT (262) 28
+BOOLCONST (263)
+OPEN_BRACE (264) 11 12 13 14 15 16 17 18 22 34 35
+CLOSE_BRACE (265) 11 12 13 14 15 16 17 18 22 34 35
+OPEN_CBRACE (266) 23 24
+CLOSE_CBRACE (267) 23 24
+SEMICOLON (268) 5 6 21 36 37
+NONE (269)
+EQL (270) 44 52 54 56
+COMMA (271) 47 50 55 56
+IF (272) 11 12 13 14 15 16
+ELSE (273) 11 12 13 14
+PLUS (274) 40
+MINUS (275) 41
+MULTIPLY (276) 42
+DEVIDE (277) 43
+NOT (278)
+INC (279)
+DEC (280)
+PLUS_EQL (281)
+MINUS_EQL (282)
+MULTIPLY_EQL (283)
+DEVIDE_EQL (284)
+DOT (285)
+WHILE (286) 17 18
+
+
+Nonterminals, with rules where they appear
+
+$accept (32)
+    on left: 0
+program (33)
+    on left: 1, on right: 0
+stmt (34)
+    on left: 2 3 4 5 6 7 8, on right: 12 13 14 15 18 19 20
+selection_stmt (35)
+    on left: 9, on right: 7
+loop_stmt (36)
+    on left: 10, on right: 8
+if_stmt (37)
+    on left: 11 12 13 14 15 16, on right: 9
+while_stmt (38)
+    on left: 17 18, on right: 10
+stmts (39)
+    on left: 19 20, on right: 1 20 23
+expr_stmt (40)
+    on left: 21, on right: 3
+func_dcl (41)
+    on left: 22, on right: 2
+block (42)
+    on left: 23 24, on right: 11 12 14 16 17 22
+numeric (43)
+    on left: 25 26, on right: 33
+numFloat (44)
+    on left: 27, on right: 25
+numInteger (45)
+    on left: 28, on right: 26
+expr (46)
+    on left: 29 30 31 32 33 34, on right: 11 12 13 14 15 16 17 18 21
+    32 34 37 44 46 47 52 54 56
+func_call (47)
+    on left: 35, on right: 30
+jump_stmt (48)
+    on left: 36 37, on right: 4
+ident (49)
+    on left: 38, on right: 22 31 35 44 51 52 53 54 55 56
+type (50)
+    on left: 39, on right: 22 51 52 53 54
+binary_op (51)
+    on left: 40 41 42 43, on right: 32
+assignment (52)
+    on left: 44, on right: 29
+call_args (53)
+    on left: 45 46 47, on right: 35 47
+func_dcl_args (54)
+    on left: 48 49 50, on right: 22 50
+var_dcl (55)
+    on left: 51 52, on right: 5 49 50
+multi_var_dcl (56)
+    on left: 53 54 55 56, on right: 6 55 56
+
+
+state 0
+
+    0 $accept: . program $end
+
+    ID          shift, and go to state 1
+    TYPE        shift, and go to state 2
+    RETURN      shift, and go to state 3
+    FLOAT       shift, and go to state 4
+    INT         shift, and go to state 5
+    OPEN_BRACE  shift, and go to state 6
+    IF          shift, and go to state 7
+    WHILE       shift, and go to state 8
+
+    program         go to state 9
+    stmt            go to state 10
+    selection_stmt  go to state 11
+    loop_stmt       go to state 12
+    if_stmt         go to state 13
+    while_stmt      go to state 14
+    stmts           go to state 15
+    expr_stmt       go to state 16
+    func_dcl        go to state 17
+    numeric         go to state 18
+    numFloat        go to state 19
+    numInteger      go to state 20
+    expr            go to state 21
+    func_call       go to state 22
+    jump_stmt       go to state 23
+    ident           go to state 24
+    type            go to state 25
+    assignment      go to state 26
+    var_dcl         go to state 27
+    multi_var_dcl   go to state 28
+
+
+state 1
+
+   38 ident: ID .
+
+    $default  reduce using rule 38 (ident)
+
+
+state 2
+
+   39 type: TYPE .
+
+    $default  reduce using rule 39 (type)
+
+
+state 3
+
+   36 jump_stmt: RETURN . SEMICOLON
+   37          | RETURN . expr SEMICOLON
+
+    ID          shift, and go to state 1
+    FLOAT       shift, and go to state 4
+    INT         shift, and go to state 5
+    OPEN_BRACE  shift, and go to state 6
+    SEMICOLON   shift, and go to state 29
+
+    numeric     go to state 18
+    numFloat    go to state 19
+    numInteger  go to state 20
+    expr        go to state 30
+    func_call   go to state 22
+    ident       go to state 24
+    assignment  go to state 26
+
+
+state 4
+
+   27 numFloat: FLOAT .
+
+    $default  reduce using rule 27 (numFloat)
+
+
+state 5
+
+   28 numInteger: INT .
+
+    $default  reduce using rule 28 (numInteger)
+
+
+state 6
+
+   34 expr: OPEN_BRACE . expr CLOSE_BRACE
+
+    ID          shift, and go to state 1
+    FLOAT       shift, and go to state 4
+    INT         shift, and go to state 5
+    OPEN_BRACE  shift, and go to state 6
+
+    numeric     go to state 18
+    numFloat    go to state 19
+    numInteger  go to state 20
+    expr        go to state 31
+    func_call   go to state 22
+    ident       go to state 24
+    assignment  go to state 26
+
+
+state 7
+
+   11 if_stmt: IF . OPEN_BRACE expr CLOSE_BRACE block ELSE block
+   12        | IF . OPEN_BRACE expr CLOSE_BRACE block ELSE stmt
+   13        | IF . OPEN_BRACE expr CLOSE_BRACE stmt ELSE stmt
+   14        | IF . OPEN_BRACE expr CLOSE_BRACE stmt ELSE block
+   15        | IF . OPEN_BRACE expr CLOSE_BRACE stmt
+   16        | IF . OPEN_BRACE expr CLOSE_BRACE block
+
+    OPEN_BRACE  shift, and go to state 32
+
+
+state 8
+
+   17 while_stmt: WHILE . OPEN_BRACE expr CLOSE_BRACE block
+   18           | WHILE . OPEN_BRACE expr CLOSE_BRACE stmt
+
+    OPEN_BRACE  shift, and go to state 33
+
+
+state 9
+
+    0 $accept: program . $end
+
+    $end  shift, and go to state 34
+
+
+state 10
+
+   19 stmts: stmt .
+
+    $default  reduce using rule 19 (stmts)
+
+
+state 11
+
+    7 stmt: selection_stmt .
+
+    $default  reduce using rule 7 (stmt)
+
+
+state 12
+
+    8 stmt: loop_stmt .
+
+    $default  reduce using rule 8 (stmt)
+
+
+state 13
+
+    9 selection_stmt: if_stmt .
+
+    $default  reduce using rule 9 (selection_stmt)
+
+
+state 14
+
+   10 loop_stmt: while_stmt .
+
+    $default  reduce using rule 10 (loop_stmt)
+
+
+state 15
+
+    1 program: stmts .
+   20 stmts: stmts . stmt
+
+    ID          shift, and go to state 1
+    TYPE        shift, and go to state 2
+    RETURN      shift, and go to state 3
+    FLOAT       shift, and go to state 4
+    INT         shift, and go to state 5
+    OPEN_BRACE  shift, and go to state 6
+    IF          shift, and go to state 7
+    WHILE       shift, and go to state 8
+
+    $default  reduce using rule 1 (program)
+
+    stmt            go to state 35
+    selection_stmt  go to state 11
+    loop_stmt       go to state 12
+    if_stmt         go to state 13
+    while_stmt      go to state 14
+    expr_stmt       go to state 16
+    func_dcl        go to state 17
+    numeric         go to state 18
+    numFloat        go to state 19
+    numInteger      go to state 20
+    expr            go to state 21
+    func_call       go to state 22
+    jump_stmt       go to state 23
+    ident           go to state 24
+    type            go to state 25
+    assignment      go to state 26
+    var_dcl         go to state 27
+    multi_var_dcl   go to state 28
+
+
+state 16
+
+    3 stmt: expr_stmt .
+
+    $default  reduce using rule 3 (stmt)
+
+
+state 17
+
+    2 stmt: func_dcl .
+
+    $default  reduce using rule 2 (stmt)
+
+
+state 18
+
+   33 expr: numeric .
+
+    $default  reduce using rule 33 (expr)
+
+
+state 19
+
+   25 numeric: numFloat .
+
+    $default  reduce using rule 25 (numeric)
+
+
+state 20
+
+   26 numeric: numInteger .
+
+    $default  reduce using rule 26 (numeric)
+
+
+state 21
+
+   21 expr_stmt: expr . SEMICOLON
+   32 expr: expr . binary_op expr
+
+    SEMICOLON  shift, and go to state 36
+    PLUS       shift, and go to state 37
+    MINUS      shift, and go to state 38
+    MULTIPLY   shift, and go to state 39
+    DEVIDE     shift, and go to state 40
+
+    binary_op  go to state 41
+
+
+state 22
+
+   30 expr: func_call .
+
+    $default  reduce using rule 30 (expr)
+
+
+state 23
+
+    4 stmt: jump_stmt .
+
+    $default  reduce using rule 4 (stmt)
+
+
+state 24
+
+   31 expr: ident .
+   35 func_call: ident . OPEN_BRACE call_args CLOSE_BRACE
+   44 assignment: ident . EQL expr
+
+    OPEN_BRACE  shift, and go to state 42
+    EQL         shift, and go to state 43
+
+    $default  reduce using rule 31 (expr)
+
+
+state 25
+
+   22 func_dcl: type . ident OPEN_BRACE func_dcl_args CLOSE_BRACE block
+   51 var_dcl: type . ident
+   52        | type . ident EQL expr
+   53 multi_var_dcl: type . ident
+   54              | type . ident EQL expr
+
+    ID  shift, and go to state 1
+
+    ident  go to state 44
+
+
+state 26
+
+   29 expr: assignment .
+
+    $default  reduce using rule 29 (expr)
+
+
+state 27
+
+    5 stmt: var_dcl . SEMICOLON
+
+    SEMICOLON  shift, and go to state 45
+
+
+state 28
+
+    6 stmt: multi_var_dcl . SEMICOLON
+   55 multi_var_dcl: multi_var_dcl . COMMA ident
+   56              | multi_var_dcl . COMMA ident EQL expr
+
+    SEMICOLON  shift, and go to state 46
+    COMMA      shift, and go to state 47
+
+
+state 29
+
+   36 jump_stmt: RETURN SEMICOLON .
+
+    $default  reduce using rule 36 (jump_stmt)
+
+
+state 30
+
+   32 expr: expr . binary_op expr
+   37 jump_stmt: RETURN expr . SEMICOLON
+
+    SEMICOLON  shift, and go to state 48
+    PLUS       shift, and go to state 37
+    MINUS      shift, and go to state 38
+    MULTIPLY   shift, and go to state 39
+    DEVIDE     shift, and go to state 40
+
+    binary_op  go to state 41
+
+
+state 31
+
+   32 expr: expr . binary_op expr
+   34     | OPEN_BRACE expr . CLOSE_BRACE
+
+    CLOSE_BRACE  shift, and go to state 49
+    PLUS         shift, and go to state 37
+    MINUS        shift, and go to state 38
+    MULTIPLY     shift, and go to state 39
+    DEVIDE       shift, and go to state 40
+
+    binary_op  go to state 41
+
+
+state 32
+
+   11 if_stmt: IF OPEN_BRACE . expr CLOSE_BRACE block ELSE block
+   12        | IF OPEN_BRACE . expr CLOSE_BRACE block ELSE stmt
+   13        | IF OPEN_BRACE . expr CLOSE_BRACE stmt ELSE stmt
+   14        | IF OPEN_BRACE . expr CLOSE_BRACE stmt ELSE block
+   15        | IF OPEN_BRACE . expr CLOSE_BRACE stmt
+   16        | IF OPEN_BRACE . expr CLOSE_BRACE block
+
+    ID          shift, and go to state 1
+    FLOAT       shift, and go to state 4
+    INT         shift, and go to state 5
+    OPEN_BRACE  shift, and go to state 6
+
+    numeric     go to state 18
+    numFloat    go to state 19
+    numInteger  go to state 20
+    expr        go to state 50
+    func_call   go to state 22
+    ident       go to state 24
+    assignment  go to state 26
+
+
+state 33
+
+   17 while_stmt: WHILE OPEN_BRACE . expr CLOSE_BRACE block
+   18           | WHILE OPEN_BRACE . expr CLOSE_BRACE stmt
+
+    ID          shift, and go to state 1
+    FLOAT       shift, and go to state 4
+    INT         shift, and go to state 5
+    OPEN_BRACE  shift, and go to state 6
+
+    numeric     go to state 18
+    numFloat    go to state 19
+    numInteger  go to state 20
+    expr        go to state 51
+    func_call   go to state 22
+    ident       go to state 24
+    assignment  go to state 26
+
+
+state 34
+
+    0 $accept: program $end .
+
+    $default  accept
+
+
+state 35
+
+   20 stmts: stmts stmt .
+
+    $default  reduce using rule 20 (stmts)
+
+
+state 36
+
+   21 expr_stmt: expr SEMICOLON .
+
+    $default  reduce using rule 21 (expr_stmt)
+
+
+state 37
+
+   40 binary_op: PLUS .
+
+    $default  reduce using rule 40 (binary_op)
+
+
+state 38
+
+   41 binary_op: MINUS .
+
+    $default  reduce using rule 41 (binary_op)
+
+
+state 39
+
+   42 binary_op: MULTIPLY .
+
+    $default  reduce using rule 42 (binary_op)
+
+
+state 40
+
+   43 binary_op: DEVIDE .
+
+    $default  reduce using rule 43 (binary_op)
+
+
+state 41
+
+   32 expr: expr binary_op . expr
+
+    ID          shift, and go to state 1
+    FLOAT       shift, and go to state 4
+    INT         shift, and go to state 5
+    OPEN_BRACE  shift, and go to state 6
+
+    numeric     go to state 18
+    numFloat    go to state 19
+    numInteger  go to state 20
+    expr        go to state 52
+    func_call   go to state 22
+    ident       go to state 24
+    assignment  go to state 26
+
+
+state 42
+
+   35 func_call: ident OPEN_BRACE . call_args CLOSE_BRACE
+
+    ID          shift, and go to state 1
+    FLOAT       shift, and go to state 4
+    INT         shift, and go to state 5
+    OPEN_BRACE  shift, and go to state 6
+
+    $default  reduce using rule 45 (call_args)
+
+    numeric     go to state 18
+    numFloat    go to state 19
+    numInteger  go to state 20
+    expr        go to state 53
+    func_call   go to state 22
+    ident       go to state 24
+    assignment  go to state 26
+    call_args   go to state 54
+
+
+state 43
+
+   44 assignment: ident EQL . expr
+
+    ID          shift, and go to state 1
+    FLOAT       shift, and go to state 4
+    INT         shift, and go to state 5
+    OPEN_BRACE  shift, and go to state 6
+
+    numeric     go to state 18
+    numFloat    go to state 19
+    numInteger  go to state 20
+    expr        go to state 55
+    func_call   go to state 22
+    ident       go to state 24
+    assignment  go to state 26
+
+
+state 44
+
+   22 func_dcl: type ident . OPEN_BRACE func_dcl_args CLOSE_BRACE block
+   51 var_dcl: type ident .
+   52        | type ident . EQL expr
+   53 multi_var_dcl: type ident .
+   54              | type ident . EQL expr
+
+    OPEN_BRACE  shift, and go to state 56
+    EQL         shift, and go to state 57
+
+    SEMICOLON  reduce using rule 51 (var_dcl)
+    SEMICOLON  [reduce using rule 53 (multi_var_dcl)]
+    COMMA      reduce using rule 53 (multi_var_dcl)
+    $default   reduce using rule 51 (var_dcl)
+
+
+state 45
+
+    5 stmt: var_dcl SEMICOLON .
+
+    $default  reduce using rule 5 (stmt)
+
+
+state 46
+
+    6 stmt: multi_var_dcl SEMICOLON .
+
+    $default  reduce using rule 6 (stmt)
+
+
+state 47
+
+   55 multi_var_dcl: multi_var_dcl COMMA . ident
+   56              | multi_var_dcl COMMA . ident EQL expr
+
+    ID  shift, and go to state 1
+
+    ident  go to state 58
+
+
+state 48
+
+   37 jump_stmt: RETURN expr SEMICOLON .
+
+    $default  reduce using rule 37 (jump_stmt)
+
+
+state 49
+
+   34 expr: OPEN_BRACE expr CLOSE_BRACE .
+
+    $default  reduce using rule 34 (expr)
+
+
+state 50
+
+   11 if_stmt: IF OPEN_BRACE expr . CLOSE_BRACE block ELSE block
+   12        | IF OPEN_BRACE expr . CLOSE_BRACE block ELSE stmt
+   13        | IF OPEN_BRACE expr . CLOSE_BRACE stmt ELSE stmt
+   14        | IF OPEN_BRACE expr . CLOSE_BRACE stmt ELSE block
+   15        | IF OPEN_BRACE expr . CLOSE_BRACE stmt
+   16        | IF OPEN_BRACE expr . CLOSE_BRACE block
+   32 expr: expr . binary_op expr
+
+    CLOSE_BRACE  shift, and go to state 59
+    PLUS         shift, and go to state 37
+    MINUS        shift, and go to state 38
+    MULTIPLY     shift, and go to state 39
+    DEVIDE       shift, and go to state 40
+
+    binary_op  go to state 41
+
+
+state 51
+
+   17 while_stmt: WHILE OPEN_BRACE expr . CLOSE_BRACE block
+   18           | WHILE OPEN_BRACE expr . CLOSE_BRACE stmt
+   32 expr: expr . binary_op expr
+
+    CLOSE_BRACE  shift, and go to state 60
+    PLUS         shift, and go to state 37
+    MINUS        shift, and go to state 38
+    MULTIPLY     shift, and go to state 39
+    DEVIDE       shift, and go to state 40
+
+    binary_op  go to state 41
+
+
+state 52
+
+   32 expr: expr . binary_op expr
+   32     | expr binary_op expr .
+
+    PLUS      shift, and go to state 37
+    MINUS     shift, and go to state 38
+    MULTIPLY  shift, and go to state 39
+    DEVIDE    shift, and go to state 40
+
+    PLUS      [reduce using rule 32 (expr)]
+    MINUS     [reduce using rule 32 (expr)]
+    MULTIPLY  [reduce using rule 32 (expr)]
+    DEVIDE    [reduce using rule 32 (expr)]
+    $default  reduce using rule 32 (expr)
+
+    binary_op  go to state 41
+
+
+state 53
+
+   32 expr: expr . binary_op expr
+   46 call_args: expr .
+
+    PLUS      shift, and go to state 37
+    MINUS     shift, and go to state 38
+    MULTIPLY  shift, and go to state 39
+    DEVIDE    shift, and go to state 40
+
+    $default  reduce using rule 46 (call_args)
+
+    binary_op  go to state 41
+
+
+state 54
+
+   35 func_call: ident OPEN_BRACE call_args . CLOSE_BRACE
+   47 call_args: call_args . COMMA expr
+
+    CLOSE_BRACE  shift, and go to state 61
+    COMMA        shift, and go to state 62
+
+
+state 55
+
+   32 expr: expr . binary_op expr
+   44 assignment: ident EQL expr .
+
+    PLUS      shift, and go to state 37
+    MINUS     shift, and go to state 38
+    MULTIPLY  shift, and go to state 39
+    DEVIDE    shift, and go to state 40
+
+    PLUS      [reduce using rule 44 (assignment)]
+    MINUS     [reduce using rule 44 (assignment)]
+    MULTIPLY  [reduce using rule 44 (assignment)]
+    DEVIDE    [reduce using rule 44 (assignment)]
+    $default  reduce using rule 44 (assignment)
+
+    binary_op  go to state 41
+
+
+state 56
+
+   22 func_dcl: type ident OPEN_BRACE . func_dcl_args CLOSE_BRACE block
+
+    TYPE  shift, and go to state 2
+
+    $default  reduce using rule 48 (func_dcl_args)
+
+    type           go to state 63
+    func_dcl_args  go to state 64
+    var_dcl        go to state 65
+
+
+state 57
+
+   52 var_dcl: type ident EQL . expr
+   54 multi_var_dcl: type ident EQL . expr
+
+    ID          shift, and go to state 1
+    FLOAT       shift, and go to state 4
+    INT         shift, and go to state 5
+    OPEN_BRACE  shift, and go to state 6
+
+    numeric     go to state 18
+    numFloat    go to state 19
+    numInteger  go to state 20
+    expr        go to state 66
+    func_call   go to state 22
+    ident       go to state 24
+    assignment  go to state 26
+
+
+state 58
+
+   55 multi_var_dcl: multi_var_dcl COMMA ident .
+   56              | multi_var_dcl COMMA ident . EQL expr
+
+    EQL  shift, and go to state 67
+
+    $default  reduce using rule 55 (multi_var_dcl)
+
+
+state 59
+
+   11 if_stmt: IF OPEN_BRACE expr CLOSE_BRACE . block ELSE block
+   12        | IF OPEN_BRACE expr CLOSE_BRACE . block ELSE stmt
+   13        | IF OPEN_BRACE expr CLOSE_BRACE . stmt ELSE stmt
+   14        | IF OPEN_BRACE expr CLOSE_BRACE . stmt ELSE block
+   15        | IF OPEN_BRACE expr CLOSE_BRACE . stmt
+   16        | IF OPEN_BRACE expr CLOSE_BRACE . block
+
+    ID           shift, and go to state 1
+    TYPE         shift, and go to state 2
+    RETURN       shift, and go to state 3
+    FLOAT        shift, and go to state 4
+    INT          shift, and go to state 5
+    OPEN_BRACE   shift, and go to state 6
+    OPEN_CBRACE  shift, and go to state 68
+    IF           shift, and go to state 7
+    WHILE        shift, and go to state 8
+
+    stmt            go to state 69
+    selection_stmt  go to state 11
+    loop_stmt       go to state 12
+    if_stmt         go to state 13
+    while_stmt      go to state 14
+    expr_stmt       go to state 16
+    func_dcl        go to state 17
+    block           go to state 70
+    numeric         go to state 18
+    numFloat        go to state 19
+    numInteger      go to state 20
+    expr            go to state 21
+    func_call       go to state 22
+    jump_stmt       go to state 23
+    ident           go to state 24
+    type            go to state 25
+    assignment      go to state 26
+    var_dcl         go to state 27
+    multi_var_dcl   go to state 28
+
+
+state 60
+
+   17 while_stmt: WHILE OPEN_BRACE expr CLOSE_BRACE . block
+   18           | WHILE OPEN_BRACE expr CLOSE_BRACE . stmt
+
+    ID           shift, and go to state 1
+    TYPE         shift, and go to state 2
+    RETURN       shift, and go to state 3
+    FLOAT        shift, and go to state 4
+    INT          shift, and go to state 5
+    OPEN_BRACE   shift, and go to state 6
+    OPEN_CBRACE  shift, and go to state 68
+    IF           shift, and go to state 7
+    WHILE        shift, and go to state 8
+
+    stmt            go to state 71
+    selection_stmt  go to state 11
+    loop_stmt       go to state 12
+    if_stmt         go to state 13
+    while_stmt      go to state 14
+    expr_stmt       go to state 16
+    func_dcl        go to state 17
+    block           go to state 72
+    numeric         go to state 18
+    numFloat        go to state 19
+    numInteger      go to state 20
+    expr            go to state 21
+    func_call       go to state 22
+    jump_stmt       go to state 23
+    ident           go to state 24
+    type            go to state 25
+    assignment      go to state 26
+    var_dcl         go to state 27
+    multi_var_dcl   go to state 28
+
+
+state 61
+
+   35 func_call: ident OPEN_BRACE call_args CLOSE_BRACE .
+
+    $default  reduce using rule 35 (func_call)
+
+
+state 62
+
+   47 call_args: call_args COMMA . expr
+
+    ID          shift, and go to state 1
+    FLOAT       shift, and go to state 4
+    INT         shift, and go to state 5
+    OPEN_BRACE  shift, and go to state 6
+
+    numeric     go to state 18
+    numFloat    go to state 19
+    numInteger  go to state 20
+    expr        go to state 73
+    func_call   go to state 22
+    ident       go to state 24
+    assignment  go to state 26
+
+
+state 63
+
+   51 var_dcl: type . ident
+   52        | type . ident EQL expr
+
+    ID  shift, and go to state 1
+
+    ident  go to state 74
+
+
+state 64
+
+   22 func_dcl: type ident OPEN_BRACE func_dcl_args . CLOSE_BRACE block
+   50 func_dcl_args: func_dcl_args . COMMA var_dcl
+
+    CLOSE_BRACE  shift, and go to state 75
+    COMMA        shift, and go to state 76
+
+
+state 65
+
+   49 func_dcl_args: var_dcl .
+
+    $default  reduce using rule 49 (func_dcl_args)
+
+
+state 66
+
+   32 expr: expr . binary_op expr
+   52 var_dcl: type ident EQL expr .
+   54 multi_var_dcl: type ident EQL expr .
+
+    PLUS      shift, and go to state 37
+    MINUS     shift, and go to state 38
+    MULTIPLY  shift, and go to state 39
+    DEVIDE    shift, and go to state 40
+
+    SEMICOLON  reduce using rule 52 (var_dcl)
+    SEMICOLON  [reduce using rule 54 (multi_var_dcl)]
+    COMMA      reduce using rule 54 (multi_var_dcl)
+    $default   reduce using rule 52 (var_dcl)
+
+    binary_op  go to state 41
+
+
+state 67
+
+   56 multi_var_dcl: multi_var_dcl COMMA ident EQL . expr
+
+    ID          shift, and go to state 1
+    FLOAT       shift, and go to state 4
+    INT         shift, and go to state 5
+    OPEN_BRACE  shift, and go to state 6
+
+    numeric     go to state 18
+    numFloat    go to state 19
+    numInteger  go to state 20
+    expr        go to state 77
+    func_call   go to state 22
+    ident       go to state 24
+    assignment  go to state 26
+
+
+state 68
+
+   23 block: OPEN_CBRACE . stmts CLOSE_CBRACE
+   24      | OPEN_CBRACE . CLOSE_CBRACE
+
+    ID            shift, and go to state 1
+    TYPE          shift, and go to state 2
+    RETURN        shift, and go to state 3
+    FLOAT         shift, and go to state 4
+    INT           shift, and go to state 5
+    OPEN_BRACE    shift, and go to state 6
+    CLOSE_CBRACE  shift, and go to state 78
+    IF            shift, and go to state 7
+    WHILE         shift, and go to state 8
+
+    stmt            go to state 10
+    selection_stmt  go to state 11
+    loop_stmt       go to state 12
+    if_stmt         go to state 13
+    while_stmt      go to state 14
+    stmts           go to state 79
+    expr_stmt       go to state 16
+    func_dcl        go to state 17
+    numeric         go to state 18
+    numFloat        go to state 19
+    numInteger      go to state 20
+    expr            go to state 21
+    func_call       go to state 22
+    jump_stmt       go to state 23
+    ident           go to state 24
+    type            go to state 25
+    assignment      go to state 26
+    var_dcl         go to state 27
+    multi_var_dcl   go to state 28
+
+
+state 69
+
+   13 if_stmt: IF OPEN_BRACE expr CLOSE_BRACE stmt . ELSE stmt
+   14        | IF OPEN_BRACE expr CLOSE_BRACE stmt . ELSE block
+   15        | IF OPEN_BRACE expr CLOSE_BRACE stmt .
+
+    ELSE  shift, and go to state 80
+
+    ELSE      [reduce using rule 15 (if_stmt)]
+    $default  reduce using rule 15 (if_stmt)
+
+
+state 70
+
+   11 if_stmt: IF OPEN_BRACE expr CLOSE_BRACE block . ELSE block
+   12        | IF OPEN_BRACE expr CLOSE_BRACE block . ELSE stmt
+   16        | IF OPEN_BRACE expr CLOSE_BRACE block .
+
+    ELSE  shift, and go to state 81
+
+    ELSE      [reduce using rule 16 (if_stmt)]
+    $default  reduce using rule 16 (if_stmt)
+
+
+state 71
+
+   18 while_stmt: WHILE OPEN_BRACE expr CLOSE_BRACE stmt .
+
+    $default  reduce using rule 18 (while_stmt)
+
+
+state 72
+
+   17 while_stmt: WHILE OPEN_BRACE expr CLOSE_BRACE block .
+
+    $default  reduce using rule 17 (while_stmt)
+
+
+state 73
+
+   32 expr: expr . binary_op expr
+   47 call_args: call_args COMMA expr .
+
+    PLUS      shift, and go to state 37
+    MINUS     shift, and go to state 38
+    MULTIPLY  shift, and go to state 39
+    DEVIDE    shift, and go to state 40
+
+    $default  reduce using rule 47 (call_args)
+
+    binary_op  go to state 41
+
+
+state 74
+
+   51 var_dcl: type ident .
+   52        | type ident . EQL expr
+
+    EQL  shift, and go to state 82
+
+    $default  reduce using rule 51 (var_dcl)
+
+
+state 75
+
+   22 func_dcl: type ident OPEN_BRACE func_dcl_args CLOSE_BRACE . block
+
+    OPEN_CBRACE  shift, and go to state 68
+
+    block  go to state 83
+
+
+state 76
+
+   50 func_dcl_args: func_dcl_args COMMA . var_dcl
+
+    TYPE  shift, and go to state 2
+
+    type     go to state 63
+    var_dcl  go to state 84
+
+
+state 77
+
+   32 expr: expr . binary_op expr
+   56 multi_var_dcl: multi_var_dcl COMMA ident EQL expr .
+
+    PLUS      shift, and go to state 37
+    MINUS     shift, and go to state 38
+    MULTIPLY  shift, and go to state 39
+    DEVIDE    shift, and go to state 40
+
+    $default  reduce using rule 56 (multi_var_dcl)
+
+    binary_op  go to state 41
+
+
+state 78
+
+   24 block: OPEN_CBRACE CLOSE_CBRACE .
+
+    $default  reduce using rule 24 (block)
+
+
+state 79
+
+   20 stmts: stmts . stmt
+   23 block: OPEN_CBRACE stmts . CLOSE_CBRACE
+
+    ID            shift, and go to state 1
+    TYPE          shift, and go to state 2
+    RETURN        shift, and go to state 3
+    FLOAT         shift, and go to state 4
+    INT           shift, and go to state 5
+    OPEN_BRACE    shift, and go to state 6
+    CLOSE_CBRACE  shift, and go to state 85
+    IF            shift, and go to state 7
+    WHILE         shift, and go to state 8
+
+    stmt            go to state 35
+    selection_stmt  go to state 11
+    loop_stmt       go to state 12
+    if_stmt         go to state 13
+    while_stmt      go to state 14
+    expr_stmt       go to state 16
+    func_dcl        go to state 17
+    numeric         go to state 18
+    numFloat        go to state 19
+    numInteger      go to state 20
+    expr            go to state 21
+    func_call       go to state 22
+    jump_stmt       go to state 23
+    ident           go to state 24
+    type            go to state 25
+    assignment      go to state 26
+    var_dcl         go to state 27
+    multi_var_dcl   go to state 28
+
+
+state 80
+
+   13 if_stmt: IF OPEN_BRACE expr CLOSE_BRACE stmt ELSE . stmt
+   14        | IF OPEN_BRACE expr CLOSE_BRACE stmt ELSE . block
+
+    ID           shift, and go to state 1
+    TYPE         shift, and go to state 2
+    RETURN       shift, and go to state 3
+    FLOAT        shift, and go to state 4
+    INT          shift, and go to state 5
+    OPEN_BRACE   shift, and go to state 6
+    OPEN_CBRACE  shift, and go to state 68
+    IF           shift, and go to state 7
+    WHILE        shift, and go to state 8
+
+    stmt            go to state 86
+    selection_stmt  go to state 11
+    loop_stmt       go to state 12
+    if_stmt         go to state 13
+    while_stmt      go to state 14
+    expr_stmt       go to state 16
+    func_dcl        go to state 17
+    block           go to state 87
+    numeric         go to state 18
+    numFloat        go to state 19
+    numInteger      go to state 20
+    expr            go to state 21
+    func_call       go to state 22
+    jump_stmt       go to state 23
+    ident           go to state 24
+    type            go to state 25
+    assignment      go to state 26
+    var_dcl         go to state 27
+    multi_var_dcl   go to state 28
+
+
+state 81
+
+   11 if_stmt: IF OPEN_BRACE expr CLOSE_BRACE block ELSE . block
+   12        | IF OPEN_BRACE expr CLOSE_BRACE block ELSE . stmt
+
+    ID           shift, and go to state 1
+    TYPE         shift, and go to state 2
+    RETURN       shift, and go to state 3
+    FLOAT        shift, and go to state 4
+    INT          shift, and go to state 5
+    OPEN_BRACE   shift, and go to state 6
+    OPEN_CBRACE  shift, and go to state 68
+    IF           shift, and go to state 7
+    WHILE        shift, and go to state 8
+
+    stmt            go to state 88
+    selection_stmt  go to state 11
+    loop_stmt       go to state 12
+    if_stmt         go to state 13
+    while_stmt      go to state 14
+    expr_stmt       go to state 16
+    func_dcl        go to state 17
+    block           go to state 89
+    numeric         go to state 18
+    numFloat        go to state 19
+    numInteger      go to state 20
+    expr            go to state 21
+    func_call       go to state 22
+    jump_stmt       go to state 23
+    ident           go to state 24
+    type            go to state 25
+    assignment      go to state 26
+    var_dcl         go to state 27
+    multi_var_dcl   go to state 28
+
+
+state 82
+
+   52 var_dcl: type ident EQL . expr
+
+    ID          shift, and go to state 1
+    FLOAT       shift, and go to state 4
+    INT         shift, and go to state 5
+    OPEN_BRACE  shift, and go to state 6
+
+    numeric     go to state 18
+    numFloat    go to state 19
+    numInteger  go to state 20
+    expr        go to state 90
+    func_call   go to state 22
+    ident       go to state 24
+    assignment  go to state 26
+
+
+state 83
+
+   22 func_dcl: type ident OPEN_BRACE func_dcl_args CLOSE_BRACE block .
+
+    $default  reduce using rule 22 (func_dcl)
+
+
+state 84
+
+   50 func_dcl_args: func_dcl_args COMMA var_dcl .
+
+    $default  reduce using rule 50 (func_dcl_args)
+
+
+state 85
+
+   23 block: OPEN_CBRACE stmts CLOSE_CBRACE .
+
+    $default  reduce using rule 23 (block)
+
+
+state 86
+
+   13 if_stmt: IF OPEN_BRACE expr CLOSE_BRACE stmt ELSE stmt .
+
+    $default  reduce using rule 13 (if_stmt)
+
+
+state 87
+
+   14 if_stmt: IF OPEN_BRACE expr CLOSE_BRACE stmt ELSE block .
+
+    $default  reduce using rule 14 (if_stmt)
+
+
+state 88
+
+   12 if_stmt: IF OPEN_BRACE expr CLOSE_BRACE block ELSE stmt .
+
+    $default  reduce using rule 12 (if_stmt)
+
+
+state 89
+
+   11 if_stmt: IF OPEN_BRACE expr CLOSE_BRACE block ELSE block .
+
+    $default  reduce using rule 11 (if_stmt)
+
+
+state 90
+
+   32 expr: expr . binary_op expr
+   52 var_dcl: type ident EQL expr .
+
+    PLUS      shift, and go to state 37
+    MINUS     shift, and go to state 38
+    MULTIPLY  shift, and go to state 39
+    DEVIDE    shift, and go to state 40
+
+    $default  reduce using rule 52 (var_dcl)
+
+    binary_op  go to state 41

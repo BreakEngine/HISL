@@ -57,7 +57,7 @@ namespace Break{
       return res;
     }
 
-    NBinaryOperator* createNBinaryOperator(NExpression& lhs, int op, NExpression& rhs){
+    NBinaryOperator* createNBinaryOperator(NExpression& lhs, std::string op, NExpression& rhs){
       NBinaryOperator* res = new NBinaryOperator(lhs,op,rhs);
       res->type = Node::BINARY_OPERATOR;
       res->parent = NULL;
@@ -87,7 +87,7 @@ namespace Break{
     }
 
     NVariableDeclaration* createNVariableDeclaration(NType& type, NIdentifier& id){
-      NVariableDeclaration* res = new NVariableDeclaration(type,id);
+      NVariableDeclaration* res = new NVariableDeclaration(type,id,NULL);
       res->type = Node::VARIABLE_DECLARATION;
       res->parent = NULL;
       return res;
@@ -139,12 +139,36 @@ namespace Break{
       return res;
     }
 
+    NMVariableDeclaration* createNMVariableDeclaration(VariableList& vars){
+      NMVariableDeclaration* res = new NMVariableDeclaration(vars);
+      res->type = Node::MULTI_VARIABLE_DECLARATION;
+      res->parent = NULL;
+      return res;
+    }
+
     NElseStatement* createNElseStatement(NStatement& stmt){
       NBlock* block = new NBlock();
       block->statements.push_back(&stmt);
 
       NElseStatement* res = new NElseStatement(*block);
       res->type = Node::ELSE_STATEMENT;
+      res->parent = NULL;
+      return res;
+    }
+
+    NWhileStatement* createNWhileStatement(NExpression& expr,NBlock& block){
+      NWhileStatement* res = new NWhileStatement(expr,block);
+      res->type = Node::WHILE_STATEMENT;
+      res->parent = NULL;
+      return res;
+    }
+
+    NWhileStatement* createNWhileStatement(NExpression& expr,NStatement& stmt){
+      NBlock* block = new NBlock();
+      block->statements.push_back(&stmt);
+
+      NWhileStatement* res = new NWhileStatement(expr,*block);
+      res->type = Node::WHILE_STATEMENT;
       res->parent = NULL;
       return res;
     }

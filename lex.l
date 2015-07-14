@@ -125,6 +125,7 @@
 
 "if"                      {return IF;}
 "else"                    {return ELSE;}
+"while"                   {return WHILE;}
 
 [a-zA-Z_][a-zA-Z0-9_]*    {SAVE_TOKEN; return ID;}             //Identifier
 [0-9]+                    {SAVE_TOKEN; return INT;}            //Integer
@@ -136,6 +137,18 @@
 ";"                       {return SEMICOLON;}
 "="                       {return EQL;}
 ","                       {return COMMA;}
+"+"                       {return PLUS;}
+"-"                       {return MINUS;}
+"*"                       {return MULTIPLY;}
+"/"                       {return DEVIDE;}
+"!"                       {return NOT;}
+"++"                      {return INC;}
+"--"                      {return DEC;}
+"+="                      {return PLUS_EQL;}
+"-="                      {return MINUS_EQL;}
+"*="                      {return MULTIPLY_EQL;}
+"/="                      {return DEVIDE_EQL;}
+"."                       {return DOT;}
 [ \t\n]                   ;                        //ignore white-spaces
 .                         {return NONE;}           //else return None Token
 %%

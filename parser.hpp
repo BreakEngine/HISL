@@ -54,7 +54,20 @@
      EQL = 270,
      COMMA = 271,
      IF = 272,
-     ELSE = 273
+     ELSE = 273,
+     PLUS = 274,
+     MINUS = 275,
+     MULTIPLY = 276,
+     DEVIDE = 277,
+     NOT = 278,
+     INC = 279,
+     DEC = 280,
+     PLUS_EQL = 281,
+     MINUS_EQL = 282,
+     MULTIPLY_EQL = 283,
+     DEVIDE_EQL = 284,
+     DOT = 285,
+     WHILE = 286
    };
 #endif
 
@@ -65,7 +78,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 14 "yacc.y"
+#line 15 "yacc.y"
 
   int token;
   float real;
@@ -87,11 +100,13 @@ typedef union YYSTYPE
   Break::HISL::ExpressionList *expr_list;
   Break::HISL::VariableList *var_list;
   Break::HISL::NIfStatement *if_stmt;
+  Break::HISL::NMVariableDeclaration *multi_var_dcl;
+  Break::HISL::NWhileStatement *while_stmt;
 
 
 
 /* Line 1676 of yacc.c  */
-#line 95 "parser.hpp"
+#line 110 "parser.hpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

@@ -1,5 +1,8 @@
-void main(){
+
+void main(int h,int lk){
   x = 6;
+  int xp=34.52,win7,koko=2354,wawa = x/54;
+  int y = x+56*9/2;
   if ( y = 5){
     y = 6;
     x = 5;
@@ -8,12 +11,15 @@ void main(){
   else{
     y = 50;
   }
-
   y = 23;
   return;
 }
 
-int anotherFunction(){
+int anotherFunction(int asd){
+  int count = 0;
+  while(x=4)
+    count = count +1;
+
   return 1;
 }
 
@@ -21,7 +27,7 @@ float a(){
   int ss=9000;
   return main(x);
 }
-dvec3 b(int xy,vec3 ab, mat4x2 koko){
+dvec3 b(){
 
   return a();
 }

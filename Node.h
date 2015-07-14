@@ -23,7 +23,8 @@ namespace Break{
         UNDEFINED, INTEGER, FLOAT, IDENTIFIER, TYPE,
         FUNCTION_CALL, BINARY_OPERATOR, ASSIGNMENT,
         BLOCK, EXPRESSION_STATEMENT, VARIABLE_DECLARATION,
-        FUNCTION_DECLARATION, RETURN, IF_STATEMENT, ELSE_STATEMENT
+        FUNCTION_DECLARATION, RETURN, IF_STATEMENT, ELSE_STATEMENT,
+        MULTI_VARIABLE_DECLARATION, WHILE_STATEMENT
       };
       Node* parent;
       std::vector<Node*> children;
@@ -107,11 +108,11 @@ namespace Break{
 
     class NBinaryOperator: public NExpression{
     public:
-      int op;
+      std::string op;
       NExpression& lhs;
       NExpression& rhs;
 
-      NBinaryOperator(NExpression& _lhs, int _op, NExpression& _rhs)
+      NBinaryOperator(NExpression& _lhs, std::string _op, NExpression& _rhs)
       :lhs(_lhs), op(_op), rhs(_rhs){}
 
       virtual void generateCode(std::ostream& code){
@@ -143,8 +144,10 @@ namespace Break{
       StatementList statements;
       virtual void generateCode(std::ostream& code){
         code<<"||Generate NBlock||"<<std::endl;
+        code<<"{";
         for(int i=0;i<statements.size();i++)
           statements[i]->generateCode(code);
+        code<<"}";
       }
     };
 
@@ -182,6 +185,34 @@ namespace Break{
         id.generateCode(code);
         if(assignmentExpr)
           assignmentExpr->generateCode(code);
+      }
+    };
+
+    class NMVariableDeclaration:public NStatement{
+    public:
+      VariableList& variables;
+
+      NMVariableDeclaration(VariableList& _var):variables(_var){}
+
+      virtual ~NMVariableDeclaration(){
+        for(int i=0;i<variables.size();i++)
+          if(variables[i])
+            delete variables[i];
+      }
+
+      NType* getType(){
+        return &variables[0]->VarType;
+      }
+
+      virtual void generateCode(std::ostream& code){
+        code<<"||Generate Multi Variable Declaration||";
+        for(int i=0;i<variables.size();i++){
+          if(variables[i])
+          {
+            variables[i]->generateCode(code);
+            code<<";";
+          }
+        }
       }
     };
 
@@ -262,6 +293,23 @@ namespace Break{
         block.generateCode(code);
         if(else_stmt)
           else_stmt->generateCode(code);
+      }
+    };
+
+    class NWhileStatement: public NStatement{
+    public:
+      NExpression& expr;
+      NBlock& block;
+
+      NWhileStatement(NExpression& _expr, NBlock& _block)
+      :expr(_expr), block(_block){}
+
+      virtual void generateCode(std::ostream& code){
+        code<<"||Generate While Statement||"<<std::endl;
+        code<<"while (";
+        expr.generateCode(code);
+        code<<")";
+        block.generateCode(code);
       }
     };
 
