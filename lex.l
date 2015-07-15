@@ -24,6 +24,7 @@
 "mat2"                    {SAVE_TOKEN; return TYPE;}
 "mat3"                    {SAVE_TOKEN; return TYPE;}
 "mat4"                    {SAVE_TOKEN; return TYPE;}
+"bool"                    {SAVE_TOKEN; return TYPE;}
 "sampler2D"               {SAVE_TOKEN; return TYPE;}
 "samplerCube"             {SAVE_TOKEN; return TYPE;}
 "true"                    {SAVE_TOKEN; return BOOLCONST;}
@@ -126,6 +127,7 @@
 "if"                      {return IF;}
 "else"                    {return ELSE;}
 "while"                   {return WHILE;}
+"for"                     {return FOR;}
 
 [a-zA-Z_][a-zA-Z0-9_]*    {SAVE_TOKEN; return ID;}             //Identifier
 [0-9]+                    {SAVE_TOKEN; return INT;}            //Integer
@@ -135,6 +137,18 @@
 "{"                       {return OPEN_CBRACE;}    //open curly brackets
 "}"                       {return CLOSE_CBRACE;}
 ";"                       {return SEMICOLON;}
+"++"                      {return INC;}
+"--"                      {return DEC;}
+"+="                      {return PLUS_EQL;}
+"-="                      {return MINUS_EQL;}
+"*="                      {return MULTIPLY_EQL;}
+"/="                      {return DEVIDE_EQL;}
+
+"=="                      {return EQL_Q;}
+"!="                      {return NEQL_Q;}
+">="                      {return GREATER_EQUAL;}
+"<="                      {return LESS_EQUAL;}
+
 "="                       {return EQL;}
 ","                       {return COMMA;}
 "+"                       {return PLUS;}
@@ -142,13 +156,14 @@
 "*"                       {return MULTIPLY;}
 "/"                       {return DEVIDE;}
 "!"                       {return NOT;}
-"++"                      {return INC;}
-"--"                      {return DEC;}
-"+="                      {return PLUS_EQL;}
-"-="                      {return MINUS_EQL;}
-"*="                      {return MULTIPLY_EQL;}
-"/="                      {return DEVIDE_EQL;}
 "."                       {return DOT;}
+">"                       {return GREATER;}
+"<"                       {return LESS;}
+"&&"                      {return AND_Q;}
+"||"                      {return OR_Q;}
+"&"                       {return AND;}
+"|"                       {return OR;}
+
 [ \t\n]                   ;                        //ignore white-spaces
 .                         {return NONE;}           //else return None Token
 %%

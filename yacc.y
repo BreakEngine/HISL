@@ -35,12 +35,16 @@ extern int yylex();
   Break::HISL::NIfStatement *if_stmt;
   Break::HISL::NMVariableDeclaration *multi_var_dcl;
   Break::HISL::NWhileStatement *while_stmt;
+  Break::HISL::NForStatement *for_stmt;
+  Break::HISL::NConstantExpression *const_expr;
+  Break::HISL::NUnaryOperator *unary_expr;
 }
 
 %token <string> ID TYPE RETURN FLOAT INT BOOLCONST
 %token <token>  OPEN_BRACE CLOSE_BRACE OPEN_CBRACE CLOSE_CBRACE SEMICOLON NONE
 %token <token>  EQL COMMA IF ELSE PLUS MINUS MULTIPLY DEVIDE NOT INC DEC PLUS_EQL
-%token <token>  MINUS_EQL MULTIPLY_EQL DEVIDE_EQL DOT WHILE
+%token <token>  MINUS_EQL MULTIPLY_EQL DEVIDE_EQL DOT WHILE FOR GREATER LESS
+%token <token>  EQL_Q NEQL_Q GREATER_EQUAL LESS_EQUAL AND OR AND_Q OR_Q
 
 //%type <token> func_dcl block;
 %type<node> program
@@ -49,7 +53,7 @@ extern int yylex();
 %type <ident> ident
 %type <ntype> type
 %type <func_call> func_call
-%type <string> binary_op
+%type <string> binary_op unary_op
 %type <assignment> assignment
 %type <expr> expr
 %type <stmt> stmt expr_stmt
@@ -62,6 +66,9 @@ extern int yylex();
 %type <stmt> if_stmt selection_stmt loop_stmt
 %type <var_list> multi_var_dcl
 %type <while_stmt> while_stmt
+%type <for_stmt> for_stmt
+%type <const_expr> const_expr
+%type <unary_expr> unary_expr
 
 %start program
 
@@ -83,6 +90,7 @@ selection_stmt : if_stmt {$$=$1;}
                ;
 
 loop_stmt : while_stmt {$$=$1;}
+          | for_stmt {$$=$1;}
           ;
 
 if_stmt : IF OPEN_BRACE expr CLOSE_BRACE block ELSE block {$$ = createNIfStatement(*$3,*$5, createNElseStatement(*$7)); }
@@ -92,6 +100,10 @@ if_stmt : IF OPEN_BRACE expr CLOSE_BRACE block ELSE block {$$ = createNIfStateme
         | IF OPEN_BRACE expr CLOSE_BRACE stmt  { $$ = createNIfStatement(*$3,*$5,NULL); }
         | IF OPEN_BRACE expr CLOSE_BRACE block { $$ = createNIfStatement(*$3,*$5,NULL); }
         ;
+
+for_stmt : FOR OPEN_BRACE stmt stmt expr CLOSE_BRACE block {$$ = createNForStatement(*$3,*$4,*$5,*$7);}
+         | FOR OPEN_BRACE stmt stmt expr CLOSE_BRACE stmt {$$ = createNForStatement(*$3,*$4,*$5,*$7);}
+         ;
 
 while_stmt : WHILE OPEN_BRACE expr CLOSE_BRACE block {$$ = createNWhileStatement(*$3,*$5);}
            | WHILE OPEN_BRACE expr CLOSE_BRACE stmt  {$$ = createNWhileStatement(*$3,*$5);}
@@ -120,18 +132,32 @@ numeric : numFloat { std::cout<<"numFloat"<<std::endl; }
         ;
 
 numFloat : FLOAT { $$ = createNFloat(toFloat(*$1));}
+         | MINUS FLOAT {$$ = createNFloat(-1*toFloat(*$2));}
+         | PLUS FLOAT {$$ = createNFloat(toFloat(*$2));}
          ;
 
 numInteger : INT { $$ = createNInteger(toInt(*$1));}
+           | MINUS INT {$$ = createNInteger(-1*toInt(*$2));}
+           | PLUS INT {$$ = createNInteger(toInt(*$2));}
            ;
 
 expr : assignment {}
      | func_call { std::cout<<"Function Call"<<std::endl; }
      | ident { std::cout<<"Just ID"<<std::endl; }
      | expr binary_op expr {$$ = createNBinaryOperator(*$1,*$2,*$3);}
-     | numeric { std::cout<<"Numeric Expr"<<std::endl; }
+     | unary_expr {$$ = $1;}
+     | numeric {}
+     | const_expr {$$=$1;}
      | OPEN_BRACE expr CLOSE_BRACE { $$ = $2;}
      ;
+
+unary_expr : unary_op expr {$$ = createNUnaryOperator(*$1,*$2,false);}
+           | expr INC {$$ = createNUnaryOperator("++",*$1,true);}
+           | expr DEC {$$ = createNUnaryOperator("--",*$1,true);}
+           ;
+
+const_expr : BOOLCONST {$$ = createNConstantExpression(*$1);}
+           ;
 
 func_call : ident OPEN_BRACE call_args CLOSE_BRACE { $$ = createNFunctionCall(*$1,*$3);}
           ;
@@ -143,11 +169,34 @@ ident : ID { $$ = createNIdentifier(*$1);}
       ;
 type : TYPE { $$ = createNType(*$1);}
      ;
+
 binary_op : PLUS {$$ = new std::string("+");}
           | MINUS {$$ = new std::string("-");}
           | MULTIPLY {$$ = new std::string("*");}
           | DEVIDE {$$ = new std::string("/");}
+          | EQL_Q {$$ = new std::string("==");}
+          | NEQL_Q {$$ = new std::string("!=");}
+          | GREATER {$$ = new std::string(">");}
+          | LESS {$$ = new std::string("<");}
+          | GREATER_EQUAL {$$ = new std::string(">=");}
+          | LESS_EQUAL {$$ = new std::string("<=");}
+          | PLUS_EQL {$$ = new std::string("+=");}
+          | MINUS_EQL {$$ = new std::string("-=");}
+          | MULTIPLY_EQL {$$ = new std::string("*=");}
+          | DEVIDE_EQL {$$ = new std::string("/=");}
+          | AND {$$ = new std::string("&");}
+          | OR {$$ = new std::string("|");}
+          | AND_Q {$$ = new std::string("&&");}
+          | OR_Q {$$ = new std::string("||");}
           ;
+
+unary_op : INC {$$ = new std::string("++");}
+         | DEC {$$ = new std::string("--");}
+         | MULTIPLY {$$ = new std::string("*");}
+         | AND {$$ = new std::string("&");}
+         | NOT {$$ = new std::string("!");}
+         ;
+
 assignment : ident EQL expr {$$ = createNAssignment(*$1,*$3);}
            ;
 call_args: /*blank*/ {$$ = new ExpressionList();}

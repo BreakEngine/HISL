@@ -1,29 +1,44 @@
 
 void main(int h,int lk){
+  bool km = true;
+  bool kk = false;
   x = 6;
+  x++;
+  x--;
+  --x;
+  ++x;
+  y = *(x);
+  m = !x;
+  y = &x;
   int xp=34.52,win7,koko=2354,wawa = x/54;
   int y = x+56*9/2;
-  if ( y = 5){
+  if ( y == 5){
     y = 6;
     x = 5;
-  }else if(x = 5)
+  }else if(x >= 5)
     y = 7;
   else{
     y = 50;
   }
   y = 23;
-  return;
+  return -1;
 }
 
 int anotherFunction(int asd){
   int count = 0;
-  while(x=4)
-    count = count +1;
+  while(x!=4)
+    count +=1;
 
-  return 1;
+  int kplus = +10;
+  float kkplus = +0.5;
+  return -1.5;
 }
 
 float a(){
+
+  for(int i=0;i<=5;i+=1)
+    int FOR_TEST = 1000;
+
   int ss=9000;
   return main(x);
 }

@@ -173,6 +173,38 @@ namespace Break{
       return res;
     }
 
+    NForStatement* createNForStatement(NStatement& s,NStatement& c, NExpression& i,NStatement& stmt){
+      NBlock* block = new NBlock();
+      block->statements.push_back(&stmt);
+
+      NForStatement* res = new NForStatement(s,c,i,*block);
+      res->type = Node::FOR_STATEMENT;
+      res->parent = NULL;
+      return res;
+    }
+
+    NForStatement* createNForStatement(NStatement& s,NStatement& c, NExpression& i,NBlock& blk){
+      NForStatement* res = new NForStatement(s,c,i,blk);
+      res->type = Node::FOR_STATEMENT;
+      res->parent = NULL;
+      return res;
+    }
+
+    NConstantExpression* createNConstantExpression(std::string val){
+      NConstantExpression* res = new NConstantExpression();
+      res->type = Node::CONST_EXPRESSION;
+      res->parent = NULL;
+      res->value = val;
+      return res;
+    }
+
+    NUnaryOperator* createNUnaryOperator(std::string op, NExpression& expr,bool after){
+      NUnaryOperator* res = new NUnaryOperator(op,expr,after);
+      res->type = Node::UNARY_OPERATOR;
+      res->parent = NULL;
+      return res;
+    }
+
     void deleteNode(Node* node){
       /*if(node != NULL){
         for(int i=0;i<node->children.size();i++)

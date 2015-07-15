@@ -67,7 +67,18 @@
      MULTIPLY_EQL = 283,
      DEVIDE_EQL = 284,
      DOT = 285,
-     WHILE = 286
+     WHILE = 286,
+     FOR = 287,
+     GREATER = 288,
+     LESS = 289,
+     EQL_Q = 290,
+     NEQL_Q = 291,
+     GREATER_EQUAL = 292,
+     LESS_EQUAL = 293,
+     AND = 294,
+     OR = 295,
+     AND_Q = 296,
+     OR_Q = 297
    };
 #endif
 
@@ -102,11 +113,14 @@ typedef union YYSTYPE
   Break::HISL::NIfStatement *if_stmt;
   Break::HISL::NMVariableDeclaration *multi_var_dcl;
   Break::HISL::NWhileStatement *while_stmt;
+  Break::HISL::NForStatement *for_stmt;
+  Break::HISL::NConstantExpression *const_expr;
+  Break::HISL::NUnaryOperator *unary_expr;
 
 
 
 /* Line 1676 of yacc.c  */
-#line 110 "parser.hpp"
+#line 124 "parser.hpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

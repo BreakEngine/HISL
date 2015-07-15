@@ -24,7 +24,8 @@ namespace Break{
         FUNCTION_CALL, BINARY_OPERATOR, ASSIGNMENT,
         BLOCK, EXPRESSION_STATEMENT, VARIABLE_DECLARATION,
         FUNCTION_DECLARATION, RETURN, IF_STATEMENT, ELSE_STATEMENT,
-        MULTI_VARIABLE_DECLARATION, WHILE_STATEMENT
+        MULTI_VARIABLE_DECLARATION, WHILE_STATEMENT, FOR_STATEMENT, CONST_EXPRESSION,
+        UNARY_OPERATOR
       };
       Node* parent;
       std::vector<Node*> children;
@@ -46,7 +47,17 @@ namespace Break{
     };
 
     class NStatement: public Node{
+    public:
+    };
 
+    class NConstantExpression: public NExpression{
+    public:
+      std::string value;
+
+      virtual void generateCode(std::ostream& code){
+        code<<"||Generate Constant Expression||"<<std::endl;
+        code<<value<<std::endl;
+      }
     };
 
     class NInteger: public NExpression{
@@ -120,6 +131,27 @@ namespace Break{
         lhs.generateCode(code);
         code<<op;
         rhs.generateCode(code);
+      }
+    };
+
+    class NUnaryOperator: public NExpression{
+    public:
+      std::string op;
+      NExpression& uhs;
+      bool after;
+
+      NUnaryOperator(std::string _op, NExpression& _uhs, bool _after)
+      :op(_op),uhs(_uhs),after(_after){}
+
+      virtual void generateCode(std::ostream& code){
+        code<<"||Generate Unary Operator||"<<std::endl;
+        if(after){
+          uhs.generateCode(code);
+          code<<op;
+        }else{
+          code<<op;
+          uhs.generateCode(code);
+        }
       }
     };
 
@@ -308,6 +340,29 @@ namespace Break{
         code<<"||Generate While Statement||"<<std::endl;
         code<<"while (";
         expr.generateCode(code);
+        code<<")";
+        block.generateCode(code);
+      }
+    };
+
+    class NForStatement: public NStatement{
+    public:
+      NStatement& start;
+      NStatement& condition;
+      NExpression& increment;
+      NBlock& block;
+
+      NForStatement(NStatement& _start, NStatement& _cond, NExpression& _inc,NBlock& _blk)
+      :start(_start), condition(_cond), increment(_inc), block(_blk){}
+
+      virtual void generateCode(std::ostream& code){
+        code<<"||Generate For Statement"<<std::endl;
+        code<<"for (";
+        start.generateCode(code);
+        code<<";";
+        condition.generateCode(code);
+        code<<";";
+        increment.generateCode(code);
         code<<")";
         block.generateCode(code);
       }
