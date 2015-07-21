@@ -45,28 +45,28 @@
      FLOAT = 261,
      INT = 262,
      BOOLCONST = 263,
-     OPEN_BRACE = 264,
-     CLOSE_BRACE = 265,
-     OPEN_CBRACE = 266,
-     CLOSE_CBRACE = 267,
-     SEMICOLON = 268,
-     NONE = 269,
-     EQL = 270,
-     COMMA = 271,
-     IF = 272,
-     ELSE = 273,
-     PLUS = 274,
-     MINUS = 275,
-     MULTIPLY = 276,
-     DEVIDE = 277,
-     NOT = 278,
-     INC = 279,
-     DEC = 280,
-     PLUS_EQL = 281,
-     MINUS_EQL = 282,
-     MULTIPLY_EQL = 283,
-     DEVIDE_EQL = 284,
-     DOT = 285,
+     STRING = 264,
+     OPEN_BRACE = 265,
+     CLOSE_BRACE = 266,
+     OPEN_CBRACE = 267,
+     CLOSE_CBRACE = 268,
+     SEMICOLON = 269,
+     NONE = 270,
+     EQL = 271,
+     COMMA = 272,
+     IF = 273,
+     ELSE = 274,
+     PLUS = 275,
+     MINUS = 276,
+     MULTIPLY = 277,
+     DEVIDE = 278,
+     NOT = 279,
+     INC = 280,
+     DEC = 281,
+     PLUS_EQL = 282,
+     MINUS_EQL = 283,
+     MULTIPLY_EQL = 284,
+     DEVIDE_EQL = 285,
      WHILE = 286,
      FOR = 287,
      GREATER = 288,
@@ -78,7 +78,20 @@
      AND = 294,
      OR = 295,
      AND_Q = 296,
-     OR_Q = 297
+     OR_Q = 297,
+     OPEN_SQBRACE = 298,
+     CLOSE_SQBRACE = 299,
+     STRUCT = 300,
+     IOBUFFER = 301,
+     COLON = 302,
+     VERTEX = 303,
+     PIXEL = 304,
+     ROUTINE = 305,
+     PROGRAM = 306,
+     DOT = 307,
+     ARROW = 308,
+     GLSL = 309,
+     HLSL = 310
    };
 #endif
 
@@ -116,11 +129,21 @@ typedef union YYSTYPE
   Break::HISL::NForStatement *for_stmt;
   Break::HISL::NConstantExpression *const_expr;
   Break::HISL::NUnaryOperator *unary_expr;
+  Break::HISL::NArrayDeclaration *arr_dcl;
+  Break::HISL::NArrayCall *arr_call;
+  Break::HISL::NStruct *strct;
+  Break::HISL::NIOBuffer *iobfr;
+  Break::HISL::NSVariableDeclaration *svar_dcl;
+  Break::HISL::NStage *stage;
+  Break::HISL::NRoutine *routine;
+  Break::HISL::NProgram *gpu_program;
+  Break::HISL::NString *my_string;
+  Break::HISL::NNative *native;
 
 
 
 /* Line 1676 of yacc.c  */
-#line 124 "parser.hpp"
+#line 147 "parser.hpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

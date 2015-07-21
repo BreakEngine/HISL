@@ -1,5 +1,6 @@
 
 void main(int h,int lk){
+
   bool km = true;
   bool kk = false;
   x = 6;
@@ -10,7 +11,9 @@ void main(int h,int lk){
   y = *(x);
   m = !x;
   y = &x;
+
   int xp=34.52,win7,koko=2354,wawa = x/54;
+
   int y = x+56*9/2;
   if ( y == 5){
     y = 6;
@@ -21,6 +24,7 @@ void main(int h,int lk){
     y = 50;
   }
   y = 23;
+  return;
   return -1;
 }
 
@@ -52,6 +56,69 @@ ivec2 c(){
 }
 
 mat3x2 d(){
+  float koko[4] = {0.0, 0.25, 0.5, 1.0};
+  int xoxo[50];
+  mat4 moka_moka[1024];
+  xoxo[moka[4]] = 1;
+  xoxo[c()] = 1;
+  xoxo[i] = 1;
   x = 5;
   return x;
 }
+
+struct moka_moka{
+int x,y;
+void process(int moka){
+  x += y*moka;
+}
+int moka_test(moka_moka t){
+
+}
+};
+
+iobuffer vs_input{
+  vec4 position : POSITION;
+  vec4 color : COLOR;
+};
+
+
+vertex VS{
+  void main(){
+    _POSITION = koko;
+    _POSITION = vec4(1,1,1,1);
+    return;
+  }
+};
+
+pixel PS{
+  void main(){
+    _COLOR = vec4(1,1,1,1);
+  }
+};
+
+routine main{
+  _VS = VS;
+  _PS = PS;
+};
+
+routine render2D{
+  _VS = VS_2D;
+  _PS = PS_2D;
+};
+
+routine render3D{
+  _VS = VS_3D;
+  _PS = PS_3D;
+};
+
+program test{
+};
+
+GLSL{"
+    layout (location = 1) in vec3 position;
+    koko wawa koko wawa koko koko wa
+"};
+
+HLSL{"
+    moka moka tatatatata moka moka
+"};

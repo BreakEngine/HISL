@@ -6,6 +6,7 @@
 #include <fstream>
 #include <string.h>
 #include <stdio.h>
+#include <algorithm>
 
 namespace Break{
   namespace HISL{
@@ -13,9 +14,13 @@ namespace Break{
     class NExpression;
     class NStatement;
     class NVariableDeclaration;
+    class Node;
+    typedef std::vector<Node*> NodeList;
     typedef std::vector<NStatement*> StatementList;
     typedef std::vector<NExpression*> ExpressionList;
     typedef std::vector<NVariableDeclaration*> VariableList;
+
+    extern void removeNode(NodeList* list,Node* node);
 
     class Node{
     public:
@@ -25,7 +30,8 @@ namespace Break{
         BLOCK, EXPRESSION_STATEMENT, VARIABLE_DECLARATION,
         FUNCTION_DECLARATION, RETURN, IF_STATEMENT, ELSE_STATEMENT,
         MULTI_VARIABLE_DECLARATION, WHILE_STATEMENT, FOR_STATEMENT, CONST_EXPRESSION,
-        UNARY_OPERATOR
+        UNARY_OPERATOR, ARRAY_DECLARATION, ARRAY_CALL, STRUCT, IOBUFFER,SEMANTIC_VARIABLE,
+        VERTEX, TYPE_CONSTRUCTOR, PIXEL, ROUTINE, PROGRAM, STRING, GLSL, HLSL
       };
       Node* parent;
       std::vector<Node*> children;
@@ -38,6 +44,9 @@ namespace Break{
       }
       virtual void generateCode(std::ostream& code){
         return;
+      }
+      virtual void correctParseTree(NodeList* list,Node* Nparent){
+
       }
     };
 
@@ -93,6 +102,64 @@ namespace Break{
       virtual void generateCode(std::ostream& code){
         code<<"||Generate NType||"<<std::endl;
         code<<value<<std::endl;
+      }
+    };
+
+    class NString: public NStatement{
+    public:
+      std::string value;
+      virtual void generateCode(std::ostream& code){
+        code<<"||Generate STRING||"<<std::endl;
+        code<<value<<std::endl;
+      }
+    };
+
+    class NArrayDeclaration: public NStatement{
+    public:
+      NType& VarType;
+      NIdentifier& id;
+      unsigned int size;
+
+      ExpressionList* init_list;
+
+      NArrayDeclaration(NType& _type, NIdentifier& _id, unsigned int _size)
+      :VarType(_type), id(_id), size(_size), init_list(NULL){}
+
+      NArrayDeclaration(NType& _type, NIdentifier& _id, unsigned int _size, ExpressionList* il)
+      :VarType(_type), id(_id), size(_size), init_list(il){}
+
+      virtual void generateCode(std::ostream& code){
+        code<<"||Generate Array Declaration||"<<std::endl;
+        VarType.generateCode(code);
+        id.generateCode(code);
+        code<<"["<<size<<"]";
+
+        if(init_list){
+          code<<" = {";
+          for(int i=0;i<init_list->size();i++){
+            (*init_list)[i]->generateCode(code);
+            if(i!=init_list->size()-1)
+              code<<",";
+          }
+          code<<"};";
+        }
+
+      }
+    };
+
+
+    class NArrayCall: public NIdentifier{
+    public:
+      NIdentifier& id;
+      NExpression& ix;
+      NArrayCall(NIdentifier& _id,NExpression& _ix):id(_id), ix(_ix){}
+
+      virtual void generateCode(std::ostream& code){
+        code<<"||Generate Array Call||"<<std::endl;
+        id.generateCode(code);
+        code<<"[";
+        ix.generateCode(code);
+        code<<"]";
       }
     };
 
@@ -181,6 +248,11 @@ namespace Break{
           statements[i]->generateCode(code);
         code<<"}";
       }
+
+      virtual void correctParseTree(NodeList* list,Node* Nparent){
+        for(int i=0;i<statements.size();i++)
+          statements[i]->correctParseTree(list,Nparent);
+      }
     };
 
     class NExpressionStatement: public NStatement{
@@ -194,6 +266,23 @@ namespace Break{
       }
     };
 
+    class NSVariableDeclaration: public NStatement{
+    public:
+      NType& VarType;
+      NIdentifier& id;
+      NIdentifier& semantic;
+
+      NSVariableDeclaration(NType& _type,NIdentifier& _id, NIdentifier& _semantic)
+      :VarType(_type), id(_id), semantic(_semantic){}
+
+      virtual void generateCode(std::ostream& code){
+        code<<"||Generate Semantic Variable||"<<std::endl;
+        VarType.generateCode(code);
+        id.generateCode(code);
+        code<<" : ";
+        semantic.generateCode(code);
+      }
+    };
     class NVariableDeclaration: public NStatement{
     public:
       NType& VarType;
@@ -291,6 +380,16 @@ namespace Break{
             args[i]->generateCode(code);
         block.generateCode(code);
       }
+
+      virtual void correctParseTree(NodeList* list,Node* Nparent){
+        if(parent!= NULL)
+          {
+            removeNode(&parent->children,this);
+          }
+        Nparent->children.push_back(this);
+        parent = Nparent;
+        removeNode(list,this);
+      }
     };
 
     class NElseStatement: public NStatement{
@@ -365,6 +464,159 @@ namespace Break{
         increment.generateCode(code);
         code<<")";
         block.generateCode(code);
+      }
+    };
+
+
+    class NStruct: public NStatement{
+    public:
+      NIdentifier& id;
+      NBlock& block;
+
+      NStruct(NIdentifier& _id, NBlock& _block): id(_id), block(_block){}
+
+      virtual void generateCode(std::ostream& code){
+        code<<"||Generate Struct Node||"<<std::endl;
+        code<<"struct ";
+        id.generateCode(code);
+        block.generateCode(code);
+        code<<";";
+      }
+
+      virtual void correctParseTree(NodeList* list,Node* Nparent){
+        if(parent!= NULL)
+          {
+            removeNode(&parent->children,this);
+          }
+        Nparent->children.push_back(this);
+        parent = Nparent;
+        block.correctParseTree(list,this);
+        removeNode(list,this);
+      }
+    };
+
+    class NStage: public NStatement{
+    public:
+      NIdentifier& id;
+      NBlock& block;
+
+      NStage(NIdentifier& _id, NBlock& _block): id(_id), block(_block){}
+
+      virtual void generateCode(std::ostream& code){
+        code<<"||Generate STAGE||"<<std::endl;
+        if(type == Node::VERTEX)
+          code<<"vertex";
+        else if(type == Node::PIXEL)
+          code<<"pixel";
+
+        id.generateCode(code);
+        block.generateCode(code);
+      }
+
+      virtual void correctParseTree(NodeList* list, Node* Nparent){
+        if(parent!=NULL){
+          removeNode(&parent->children,this);
+        }
+        Nparent->children.push_back(this);
+        parent = Nparent;
+        block.correctParseTree(list,this);
+        removeNode(list,this);
+      }
+    };
+
+    class NRoutine: public NStatement{
+    public:
+      NIdentifier& id;
+      NBlock& block;
+
+      NRoutine(NIdentifier& _id, NBlock& _block): id(_id), block(_block){}
+
+      virtual void generateCode(std::ostream& code){
+        code<<"||Generate ROUTINE||"<<std::endl;
+        code<<"routine";
+
+        id.generateCode(code);
+        block.generateCode(code);
+      }
+
+      virtual void correctParseTree(NodeList* list, Node* Nparent){
+        if(parent!=NULL){
+          removeNode(&parent->children,this);
+        }
+        Nparent->children.push_back(this);
+        parent = Nparent;
+        block.correctParseTree(list,this);
+        removeNode(list,this);
+      }
+    };
+
+    class NNative: public NStatement{
+    public:
+      NString& block;
+
+      NNative(NString& _block):block(_block){}
+
+      virtual void generateCode(std::ostream& code){
+        code<<"||Native Block||"<<std::endl;
+        block.generateCode(code);
+      }
+
+      virtual void correctParseTree(NodeList* list, Node* Nparent){
+        if(parent!=NULL){
+          removeNode(&parent->children,this);
+        }
+        Nparent->children.push_back(this);
+        parent = Nparent;
+        removeNode(list,this);
+      }
+    };
+    class NProgram: public NStatement{
+    public:
+      NIdentifier& id;
+      NBlock& block;
+
+      NProgram(NIdentifier& _id, NBlock& _block): id(_id), block(_block){}
+
+      virtual void generateCode(std::ostream& code){
+        code<<"||Generate PROGRAM||"<<std::endl;
+        code<<"program";
+
+        id.generateCode(code);
+        block.generateCode(code);
+      }
+
+      virtual void correctParseTree(NodeList* list, Node* Nparent){
+        if(parent!=NULL){
+          removeNode(&parent->children,this);
+        }
+        Nparent->children.push_back(this);
+        parent = Nparent;
+        block.correctParseTree(list,this);
+        removeNode(list,this);
+      }
+    };
+
+    class NIOBuffer: public NStatement{
+    public:
+      NIdentifier& id;
+      NBlock& block;
+
+      NIOBuffer(NIdentifier& _id, NBlock& _block): id(_id), block(_block){}
+
+      virtual void generateCode(std::ostream& code){
+        code<<"||Generate IOBuffer||"<<std::endl;
+
+        code<<"iobuffer";
+        id.generateCode(code);
+        block.generateCode(code);
+      }
+      virtual void correctParseTree(NodeList* list, Node* Nparent){
+        if(parent!=NULL){
+          removeNode(&parent->children,this);
+        }
+        Nparent->children.push_back(this);
+        parent = Nparent;
+        removeNode(list,this);
       }
     };
 

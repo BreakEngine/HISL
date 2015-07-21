@@ -1,0 +1,47 @@
+program main{
+
+  iobuffer vs_in{
+      vec4 position : POSITION;
+      vec4 color : COLOR;
+  };
+
+  iobuffer ps_in{
+    vec4 color : COLOR;
+  };
+
+
+  vertex VS{
+
+    ps_in main(vs_in input){
+      ps_in output;
+
+      _POSITION = input.position;
+      output.color = input->color;
+
+      return output;
+    }
+
+  };
+
+  vertex NVS{
+    GLSL{"
+      layout(location = 0) vec4 position;
+      ...
+    "};
+  };
+
+  pixel PS{
+    void main(ps_in input){
+        gl_FragColor = vec4(1,1,1,1);
+      HLSL{
+        return float4(1,1,1,1);
+      };
+    }
+  };
+
+  routine main{
+    _VS = VS;
+    _PS = PS;
+  };
+
+};

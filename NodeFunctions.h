@@ -1,6 +1,7 @@
 #ifndef NODE_FUCNTIONS_H
 #define NODE_FUCNTIONS_H
 #include "Node.h"
+extern int ix;
 namespace Break{
   namespace HISL{
 
@@ -53,6 +54,13 @@ namespace Break{
     NFunctionCall* createNFunctionCall(NIdentifier& id, ExpressionList& args){
       NFunctionCall* res = new NFunctionCall(id,args);
       res->type = Node::FUNCTION_CALL;
+      res->parent = NULL;
+      return res;
+    }
+
+    NFunctionCall* createNFunctionCall(NType& id, ExpressionList& args){
+      NFunctionCall* res = new NFunctionCall(*createNIdentifier(id.value),args);
+      res->type = Node::TYPE_CONSTRUCTOR;
       res->parent = NULL;
       return res;
     }
@@ -205,6 +213,91 @@ namespace Break{
       return res;
     }
 
+    NArrayDeclaration* createNArrayDeclaration(NType& type, NIdentifier& id, unsigned int size){
+      NArrayDeclaration* res = new NArrayDeclaration(type,id,size);
+      res->type = Node::ARRAY_DECLARATION;
+      res->parent = NULL;
+      return res;
+    }
+
+    NArrayDeclaration* createNArrayDeclaration(NType& type, NIdentifier& id, unsigned int size, ExpressionList* expr){
+      NArrayDeclaration* res = new NArrayDeclaration(type,id,size,expr);
+      res->type = Node::ARRAY_DECLARATION;
+      res->parent = NULL;
+      return res;
+    }
+
+    NArrayCall* createNArrayCall(NIdentifier& id, NExpression& ix){
+      NArrayCall* res = new NArrayCall(id,ix);
+      res->type = Node::ARRAY_CALL;
+      res->parent = NULL;
+      return res;
+    }
+
+    NStruct* createNStruct(NIdentifier& id, NBlock& block){
+      NStruct* res = new NStruct(id,block);
+      res->type = Node::STRUCT;
+      res->parent = NULL;
+      return res;
+    }
+
+    NIOBuffer* createNIOBuffer(NIdentifier& id, NBlock& block){
+      NIOBuffer* res = new NIOBuffer(id,block);
+      res->type = Node::IOBUFFER;
+      res->parent = NULL;
+      return res;
+    }
+
+    NSVariableDeclaration* createNSVariableDeclaration(NType& type, NIdentifier& id, NIdentifier& semantic){
+      NSVariableDeclaration* res = new NSVariableDeclaration(type,id,semantic);
+      res->type = Node::SEMANTIC_VARIABLE;
+      res->parent = NULL;
+      return res;
+    }
+
+    NStage* createNVertex(NIdentifier& id, NBlock& block){
+      NStage* res = new NStage(id,block);
+      res->type = Node::VERTEX;
+      res->parent = NULL;
+      return res;
+    }
+
+    NStage* createNPixel(NIdentifier& id, NBlock& block){
+      NStage* res = new NStage(id,block);
+      res->type = Node::PIXEL;
+      res->parent = NULL;
+      return res;
+    }
+
+    NRoutine* createNRoutine(NIdentifier& id, NBlock& block){
+      NRoutine* res = new NRoutine(id,block);
+      res->type = Node::ROUTINE;
+      res->parent = NULL;
+      return res;
+    }
+
+    NProgram* createNProgram(NIdentifier& id, NBlock& block){
+      NProgram* res = new NProgram(id,block);
+      res->type = Node::PROGRAM;
+      res->parent = NULL;
+      return res;
+    }
+
+    NString* createNString(std::string& val){
+      NString* res = new NString();
+      res->value = val;
+      res->type = Node::STRING;
+      res->parent = NULL;
+      return res;
+    }
+
+    NNative* createNNative(Node::Type type, NString& str){
+      NNative* res = new NNative(str);
+      res->type = type;
+      res->parent = NULL;
+      return res;
+    }
+
     void deleteNode(Node* node){
       /*if(node != NULL){
         for(int i=0;i<node->children.size();i++)
@@ -217,6 +310,16 @@ namespace Break{
     void addChild(Node* _parent, Node* child){
       child->parent = _parent;
       _parent->children.push_back(child);
+    }
+
+    void removeNode(NodeList* list, Node* node){
+      if(list && node){
+        list->erase(std::remove_if(list->begin(),list->end(),
+        [node](const Node* liNode){
+          return node == liNode;
+        }),list->end());
+        ix--;
+      }
     }
 
   }

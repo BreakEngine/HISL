@@ -1,13 +1,29 @@
+SP  (u8|u|U|L)
+ES  (\\(['"\?\\abfnrtv]|[0-7]{1,3}|x[a-fA-F0-9]+))
+WS  [ \t\v\n\f]
+
 %{
 #include <string>
 #include "Node.h"
 #include "parser.hpp"
 #include <iostream>
 #define SAVE_TOKEN yylval.string = new std::string(yytext, yyleng)
+extern void yyerror(char*);
+std::string* consumeString();
 %}
 
 
 %%
+"//".*                    {}
+"struct"                  {return STRUCT;}
+"vertex"                  {return VERTEX;}
+"pixel"                   {return PIXEL;}
+"routine"                 {return ROUTINE;}
+"program"                 {return PROGRAM;}
+"iobuffer"                {return IOBUFFER;}
+"GLSL"                    {return GLSL;}
+"HLSL"                    {return HLSL;}
+(["])                     {yylval.string = consumeString(); return STRING;}
 "return"                  {return RETURN;}         //return keyword
 "void"                    {SAVE_TOKEN; return TYPE;}
 "int"                     {SAVE_TOKEN; return TYPE;}
@@ -136,7 +152,12 @@
 ")"                       {return CLOSE_BRACE;}    //close brace
 "{"                       {return OPEN_CBRACE;}    //open curly brackets
 "}"                       {return CLOSE_CBRACE;}
+"["                       {return OPEN_SQBRACE;}
+"]"                       {return CLOSE_SQBRACE;}
 ";"                       {return SEMICOLON;}
+":"                       {return COLON;}
+"."                       {return DOT;}
+"->"                      {return ARROW;}
 "++"                      {return INC;}
 "--"                      {return DEC;}
 "+="                      {return PLUS_EQL;}
@@ -156,7 +177,6 @@
 "*"                       {return MULTIPLY;}
 "/"                       {return DEVIDE;}
 "!"                       {return NOT;}
-"."                       {return DOT;}
 ">"                       {return GREATER;}
 "<"                       {return LESS;}
 "&&"                      {return AND_Q;}
@@ -164,10 +184,27 @@
 "&"                       {return AND;}
 "|"                       {return OR;}
 
-[ \t\n]                   ;                        //ignore white-spaces
+[ \t]                     ;                        //ignore white-spaces
+"\n"                      {yylineno++;}
 .                         {return NONE;}           //else return None Token
 %%
 
+std::string* consumeString()
+{
+  std::string* str = new std::string();
+
+  int x;
+  while(0 != (x = yyinput()))
+  {
+    if(x == '"')
+      return str;
+    if(x == 0)
+      break;
+
+    str->push_back((char)x);
+  }
+  return NULL;
+}
 int yywrap(void){
   return 1;
 }
