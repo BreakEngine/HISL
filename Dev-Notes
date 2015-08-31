@@ -1,0 +1,119 @@
+HISL language specification
+
+C++ like language for shading language that has "HLSL" and "GLSL" backend
+
+# Language Types
+	- int
+	- float
+	- vec2
+	- vec3
+	- vec4
+	- mat2
+	- mat3
+	- mat4
+	- texture2D
+
+# Built-in Type spec
+	
+	vec2: {
+		float x,y;
+	}
+	
+	vec3: {
+		float x,y,z;
+	}
+	
+	vec4: {
+		float x,y,z,w;
+	}
+	
+	mat2: {
+		vec2[2];
+	}
+	
+	mat3: {
+		vec3[3];
+	}
+	
+	mat4: {
+		vec4[4];
+	}
+	
+	texture2D: {
+		vec4 sample(vec2 coords);
+	}
+
+
+# Blocks
+	program: represents a gpu program with all the stages
+	syntax:
+	program prog_name
+	{
+	
+	};
+	
+	routine: routine is a type of configuration block that assigns stages to gpu
+	pipeline, every program must have atleast one routine with name similar to program name
+	syntax:
+	routine routine_name
+	{
+	
+	};
+	
+	iobuffer: iobuffer is a buffer that moves across stages or represents a vertex stage input, output, or
+	pixel stage input, iobuffer has only semantic variables
+	syntax:
+	iobuffer buffer_name
+	{
+	
+	};
+	
+	struct: this is just plain old c struct type that has only data members
+	syntax:
+	struct struct_name
+	{
+	
+	};
+	
+	uniform: this is a uniform block represents data buffer that will be assigned by cpu at run-time at well
+	syntax:
+	uniform uniform_name
+	{
+	
+	};
+	
+	vertex: represents a vertex stage of the pipeline, treat it as a .vert file
+	syntax:
+	vertex vertex_name
+	{
+	
+	};
+	
+	pixel: represents a pixel stage of the pipeline, treat it as a .frag file
+	syntax:
+	pixel pixel_name
+	{
+	
+	};
+	
+# New Statements
+	
+	Config statement: represents a statement of assigning a value to predefine variable
+	syntax:
+	predefined_variable = expression;
+	
+	Semantic variable: represents a variable declaration that has a semantic value, only available in iobuffer blocks
+	syntax:
+	type identifier : semantic;
+	
+# Main Function
+	
+	main function has a special syntax for passing values around between stages
+	syntax:
+	void main(iobuffer arg);
+	
+	this is just a main function of a stage that accepts a buffer named arg and returns nothing
+	
+	[type:name] main(iobuffer arg);
+	
+	this function accepts a buffer named arg as input and passes a object of [type:name] that has a "name"	

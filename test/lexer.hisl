@@ -1,0 +1,71 @@
+program main{
+	struct moka;
+	struct koko1{
+		moka m;
+		vec2 mx;
+		int xol[4];
+	};
+	struct moka{
+		vec4 y;
+		float x,yy,z;
+		koko1 ma;
+		vec2 ok;
+	};
+	struct arrTest{
+		float data[4];
+	};
+
+	iobuffer koko{
+		vec4 position : POSITION;
+		mat4 mhs : MAT;
+	};
+
+	vertex VS{
+		struct ms;
+		struct vs_s{
+			int x,y;
+		};
+
+		uniform Matrices{
+			mat4 model,view,proj;
+		};
+
+		int mfun(){
+			int xoxo;
+		}
+
+		mat4 getMatrix(){
+
+		}
+
+		moka getMoka();
+
+		texture2D texture;
+		texture2D texr[5];
+
+		vs_s main(){
+			mat4 proji,modeli;
+			mat4 posi;
+			y = vec4(1,1,1,1) * getMoka();
+			int opx=100,mokas=92,mfun;
+			ox = y+opx;
+			!mokas;
+			texture.sample(state,texCoord);
+			ox = vec4(1,1,1,1);
+		}
+	};
+
+	pixel PS{
+		int x,y,z;
+	};
+
+	struct vs_s;
+	struct kokowe{
+		vs_s m;
+	};
+
+	routine main{
+		g_vs = VS;
+		g_ps = PS;
+	};
+};

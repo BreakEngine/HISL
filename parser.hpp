@@ -39,59 +39,50 @@
    /* Put the tokens into the symbol table, so that GDB and other debuggers
       know about them.  */
    enum yytokentype {
-     ID = 258,
-     TYPE = 259,
-     RETURN = 260,
-     FLOAT = 261,
-     INT = 262,
-     BOOLCONST = 263,
-     STRING = 264,
-     OPEN_BRACE = 265,
-     CLOSE_BRACE = 266,
-     OPEN_CBRACE = 267,
-     CLOSE_CBRACE = 268,
-     SEMICOLON = 269,
-     NONE = 270,
-     EQL = 271,
-     COMMA = 272,
-     IF = 273,
-     ELSE = 274,
-     PLUS = 275,
-     MINUS = 276,
-     MULTIPLY = 277,
-     DEVIDE = 278,
-     NOT = 279,
-     INC = 280,
-     DEC = 281,
+     INTEGER = 258,
+     ID = 259,
+     TYPE = 260,
+     BUILTIN_VAR = 261,
+     FLOAT = 262,
+     PROGRAM = 263,
+     SEMICOLON = 264,
+     ROUTINE = 265,
+     STRUCT = 266,
+     VERTEX = 267,
+     PIXEL = 268,
+     IOBUFFER = 269,
+     UNIFORM = 270,
+     OPEN_BRACE = 271,
+     CLOSE_BRACE = 272,
+     COMMA = 273,
+     COLON = 274,
+     OPEN_PAREN = 275,
+     CLOSE_PAREN = 276,
+     EQL = 277,
+     DOT = 278,
+     ARROW = 279,
+     OPEN_BRACKET = 280,
+     CLOSE_BRACKET = 281,
      PLUS_EQL = 282,
      MINUS_EQL = 283,
-     MULTIPLY_EQL = 284,
-     DEVIDE_EQL = 285,
-     WHILE = 286,
-     FOR = 287,
-     GREATER = 288,
-     LESS = 289,
-     EQL_Q = 290,
-     NEQL_Q = 291,
-     GREATER_EQUAL = 292,
-     LESS_EQUAL = 293,
-     AND = 294,
-     OR = 295,
-     AND_Q = 296,
-     OR_Q = 297,
-     OPEN_SQBRACE = 298,
-     CLOSE_SQBRACE = 299,
-     STRUCT = 300,
-     IOBUFFER = 301,
-     COLON = 302,
-     VERTEX = 303,
-     PIXEL = 304,
-     ROUTINE = 305,
-     PROGRAM = 306,
-     DOT = 307,
-     ARROW = 308,
-     GLSL = 309,
-     HLSL = 310
+     MUL_EQL = 284,
+     DEV_EQL = 285,
+     MOD_EQL = 286,
+     PLUS = 287,
+     MINUS = 288,
+     MUL = 289,
+     DEV = 290,
+     MOD = 291,
+     LEQL = 292,
+     GEQL = 293,
+     QEQL = 294,
+     NOT_EQL = 295,
+     AND = 296,
+     OR = 297,
+     NOT = 298,
+     INC = 299,
+     DEC = 300,
+     STD = 301
    };
 #endif
 
@@ -102,48 +93,49 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 15 "yacc.y"
+#line 14 "parser.ypp"
 
-  int token;
-  float real;
-  std::string *string;
-  Break::HISL::Node *node;
-  Break::HISL::NInteger *numInteger;
-  Break::HISL::NFloat *numFloat;
-  Break::HISL::NIdentifier *ident;
-  Break::HISL::NType *ntype;
-  Break::HISL::NFunctionCall *func_call;
-  Break::HISL::NBinaryOperator *binary_op;
-  Break::HISL::NAssignment *assignment;
-  Break::HISL::NExpression *expr;
-  Break::HISL::NStatement *stmt;
-  Break::HISL::NBlock *block;
-  Break::HISL::NVariableDeclaration *var_dcl;
-  Break::HISL::NFunctionDeclaration *func_dcl;
-  Break::HISL::NReturnStatement *ret_stmt;
-  Break::HISL::ExpressionList *expr_list;
-  Break::HISL::VariableList *var_list;
-  Break::HISL::NIfStatement *if_stmt;
-  Break::HISL::NMVariableDeclaration *multi_var_dcl;
-  Break::HISL::NWhileStatement *while_stmt;
-  Break::HISL::NForStatement *for_stmt;
-  Break::HISL::NConstantExpression *const_expr;
-  Break::HISL::NUnaryOperator *unary_expr;
-  Break::HISL::NArrayDeclaration *arr_dcl;
-  Break::HISL::NArrayCall *arr_call;
-  Break::HISL::NStruct *strct;
-  Break::HISL::NIOBuffer *iobfr;
-  Break::HISL::NSVariableDeclaration *svar_dcl;
-  Break::HISL::NStage *stage;
-  Break::HISL::NRoutine *routine;
-  Break::HISL::NProgram *gpu_program;
-  Break::HISL::NString *my_string;
-  Break::HISL::NNative *native;
+  int inum;
+  std::string* value;
+  HISL::PTNode* node;
+  HISL::PTInt* integer;
+  HISL::PTFloat* flt;
+  std::string* str;
+  HISL::PTVariableList* var_list;
+  std::vector<HISL::PTVariableDeclaration>* strct_blck;
+  HISL::PTVariableDeclaration* var_dcl;
+  HISL::PTSemanticVariable* svar_dcl;
+  std::vector<HISL::PTSemanticVariable>* bfr_blck;
+  HISL::PTBlock* generic_blck;
+  HISL::PTStatement* generic_stmt;
+  HISL::PTArg* argument;
+  std::vector<HISL::PTArg>* arg_lst;
+  HISL::PTFunctionDeclaration* func_dcl;
+  HISL::PTFunctionDefinition* func_def;
+  HISL::PTProgram* prg;
+  HISL::PTStruct* strct;
+  HISL::PTUniform* unifrom;
+  HISL::PTArrayDeclaration* array;
+  HISL::PTIOBuffer* bfr;
+  HISL::PTStage* stg;
+  HISL::PTExpressionStmt* exprstmt;
+  HISL::PTAssignment* ass;
+  HISL::PTExpression* expr;
+  HISL::PTLValue* lval;
+  std::vector<HISL::PTLValue*>* lvalList;
+  HISL::PTUnaryExpression* unaryExp;
+  std::vector<HISL::PTStatement*>* bstmts;
+  HISL::PTArrayCall* arr_call;
+  HISL::PTFunctionCall* funcCall;
+  std::vector<HISL::PTExpression*>* expr_list;
+  std::vector<HISL::PTConfig*>* config_list;
+  HISL::PTRoutine* routine;
+  HISL::PTTypeConstructor* type_construct;
 
 
 
 /* Line 1676 of yacc.c  */
-#line 147 "parser.hpp"
+#line 139 "parser.hpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

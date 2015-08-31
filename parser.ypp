@@ -1,0 +1,376 @@
+%{
+#include <iostream>
+#include <string>
+#include <vector>
+#include "PTree.hpp"
+#include "Driver.hpp"
+extern HISL::Driver* driver;
+extern int yylex();
+void yyerror(std::string e);
+void report(std::string e);
+%}
+
+
+%union{
+  int inum;
+  std::string* value;
+  HISL::PTNode* node;
+  HISL::PTInt* integer;
+  HISL::PTFloat* flt;
+  std::string* str;
+  HISL::PTVariableList* var_list;
+  std::vector<HISL::PTVariableDeclaration>* strct_blck;
+  HISL::PTVariableDeclaration* var_dcl;
+  HISL::PTSemanticVariable* svar_dcl;
+  std::vector<HISL::PTSemanticVariable>* bfr_blck;
+  HISL::PTBlock* generic_blck;
+  HISL::PTStatement* generic_stmt;
+  HISL::PTArg* argument;
+  std::vector<HISL::PTArg>* arg_lst;
+  HISL::PTFunctionDeclaration* func_dcl;
+  HISL::PTFunctionDefinition* func_def;
+  HISL::PTProgram* prg;
+  HISL::PTStruct* strct;
+  HISL::PTUniform* unifrom;
+  HISL::PTArrayDeclaration* array;
+  HISL::PTIOBuffer* bfr;
+  HISL::PTStage* stg;
+  HISL::PTExpressionStmt* exprstmt;
+  HISL::PTAssignment* ass;
+  HISL::PTExpression* expr;
+  HISL::PTLValue* lval;
+  std::vector<HISL::PTLValue*>* lvalList;
+  HISL::PTUnaryExpression* unaryExp;
+  std::vector<HISL::PTStatement*>* bstmts;
+  HISL::PTArrayCall* arr_call;
+  HISL::PTFunctionCall* funcCall;
+  std::vector<HISL::PTExpression*>* expr_list;
+  std::vector<HISL::PTConfig*>* config_list;
+  HISL::PTRoutine* routine;
+  HISL::PTTypeConstructor* type_construct;
+}
+
+%token<value> INTEGER ID TYPE BUILTIN_VAR
+%token<value> FLOAT
+
+%token<inum> PROGRAM SEMICOLON ROUTINE STRUCT VERTEX PIXEL IOBUFFER UNIFORM
+%token<inum> OPEN_BRACE CLOSE_BRACE COMMA COLON OPEN_PAREN CLOSE_PAREN EQL
+%token<inum> DOT ARROW OPEN_BRACKET CLOSE_BRACKET PLUS_EQL MINUS_EQL MUL_EQL
+%token<inum> DEV_EQL MOD_EQL PLUS MINUS MUL DEV MOD LEQL GEQL QEQL NOT_EQL
+%token<inum> AND OR NOT INC DEC STD
+
+%type<node> variable_spec start
+
+%type<type_construct> type_constructor
+
+%type<stg> vertex pixel
+
+%type<routine> routine_node
+
+%type<array> g_arr_dcl
+
+%type<unifrom> unifrom_block
+
+%type<config_list> config_block
+
+%type<bfr_blck> buffer_stmts buffer_block
+
+%type<var_list> id_list g_id_list
+
+%type<var_dcl> variable_dcl g_var_dcl
+
+%type<svar_dcl> semantic_variable
+
+%type<generic_blck> stage_block block program_block
+
+%type<bstmts> stmts struct_stmts struct_block 
+
+%type<generic_stmt> stage_stmts program_stmts stmt
+
+%type<argument> arg
+
+%type<arg_lst> arg_list;
+
+%type<func_dcl> function_dcl
+
+%type<func_def> function_def
+
+%type<prg> program
+
+%type<strct> struct_node
+
+%type<bfr> iobuffer
+
+%type<exprstmt> expr_stmt
+
+%type<ass> assignment
+
+%type<expr> expression
+
+%type<lval> lvalue
+
+%type<funcCall> func_call
+
+%type<arr_call> arr_access
+
+%type<str> binary_op
+
+%type<lval> access_chain
+
+%type<unaryExp> unary_expr
+
+%type<integer> int_num
+
+%type<flt> float_num
+
+%type<expr_list> args;
+
+%%
+start           : program {$$ = $1;}
+                ;
+
+program         : PROGRAM ID OPEN_BRACE program_block CLOSE_BRACE SEMICOLON {$$ = driver->createProgram((HISL::PTId*)driver->createId(*$2),$4); driver->m_PTroot->m_children.push_back($$);}
+                ;
+
+struct_node     : STRUCT ID struct_block SEMICOLON {$$ = driver->createStruct(driver->createId(*$2),*$3); driver->m_PTroot->m_children.push_back($$);}
+                ;
+
+routine_node    : ROUTINE ID OPEN_BRACE config_block CLOSE_BRACE { $$ = driver->createRoutine(driver->createId(*$2),$4);}
+                ;
+
+config_block    : {$$ = new std::vector<HISL::PTConfig*>();}
+                | BUILTIN_VAR EQL ID SEMICOLON {$$ = new std::vector<HISL::PTConfig*>();
+                 $$->push_back(driver->createConfigStatement(driver->createId(*$1),driver->createId(*$3)));}
+                | config_block BUILTIN_VAR EQL ID SEMICOLON {$1->push_back(driver->createConfigStatement(driver->createId(*$2),driver->createId(*$4)));}
+                ;
+
+iobuffer        : IOBUFFER ID buffer_block SEMICOLON {$$ = driver->createBuffer(driver->createId(*$2),*$3); driver->m_PTroot->m_children.push_back($$);}
+                ;
+
+vertex          : VERTEX ID OPEN_BRACE stage_block CLOSE_BRACE SEMICOLON {$$ = driver->createVertex(driver->createId(*$2),$4);driver->m_PTroot->m_children.push_back($$);}
+                ;
+
+pixel           : PIXEL ID OPEN_BRACE stage_block CLOSE_BRACE SEMICOLON {$$ = driver->createPixel(driver->createId(*$2),$4);driver->m_PTroot->m_children.push_back($$);}
+                ;
+
+type_constructor : TYPE OPEN_PAREN args CLOSE_PAREN { $$ = driver->createTypeConstructor(driver->createType(*$1),$3);}
+                 ;
+
+function_dcl    : variable_spec ID OPEN_PAREN arg_list CLOSE_PAREN {$$ = driver->createFuncDcl($1,driver->createId(*$2),*$4); driver->m_PTroot->m_children.push_back($$);}
+                ;
+
+function_def    : function_dcl block {$$ = driver->createFuncDef($1,$2); driver->m_PTroot->m_children.push_back($$);}
+                ;
+
+arg_list        : {$$ = new std::vector<HISL::PTArg>();}
+                | arg {$$ = new std::vector<HISL::PTArg>(); $$->push_back(*$1);}
+                | arg_list COMMA arg {$1->push_back(*$3);}
+                ;
+
+arg             : variable_spec {$$ = driver->createArg($1,NULL);}
+                | variable_spec ID {$$ = driver->createArg($1,driver->createId(*$2));}
+                ;
+
+stage_block     : {$$ = driver->createBlock();}
+                | stage_stmts {$$ = driver->createBlock(); $$->instructions.push_back($1);}
+                | stage_block stage_stmts {$1->instructions.push_back($2);}
+                ;
+
+stage_stmts     : struct_node{$$ = (HISL::PTStatement*)$1;}
+                | STRUCT ID SEMICOLON {$$ = (HISL::PTStatement*)driver->createDeclaration(driver->createType("struct"),driver->createId(*$2));}
+                | function_dcl SEMICOLON{$$ = $1;}
+                | function_def {$$ = $1;}
+                | g_var_dcl SEMICOLON {$$ = $1;}
+                | unifrom_block SEMICOLON { $$ = $1;}
+                | g_arr_dcl SEMICOLON {$$ =$1;}
+                ;
+
+unifrom_block   : UNIFORM ID struct_block {$$ = driver->createUniform(driver->createId(*$2),*$3); driver->m_PTroot->m_children.push_back($$);}
+                ;
+
+struct_block    : OPEN_BRACE CLOSE_BRACE {$$ = new std::vector<HISL::PTStatement*>();}
+                | OPEN_BRACE struct_stmts CLOSE_BRACE {$$ = $2;}
+                ;
+
+struct_stmts : variable_dcl SEMICOLON {$$ = new std::vector<HISL::PTStatement*>();
+                                       $$->push_back(($1));}
+             | g_arr_dcl SEMICOLON {$$ = new std::vector<HISL::PTStatement*>();
+                                       $$->push_back(($1));}
+             | struct_stmts variable_dcl SEMICOLON {$1->push_back(($2));}
+             | struct_stmts g_arr_dcl SEMICOLON {$1->push_back($2);}
+             ;
+program_block   : {$$ = driver->createBlock();}
+                | program_stmts {$$ = driver->createBlock(); $$->instructions.push_back($1);}
+                | program_block program_stmts {$1->instructions.push_back($2);}
+                ;
+
+program_stmts   : STRUCT ID SEMICOLON {$$ = driver->createDeclaration(driver->createType("struct"),driver->createId(*$2));}
+                | IOBUFFER ID SEMICOLON {$$ = driver->createDeclaration(driver->createType("iobuffer"),driver->createId(*$2));}
+                | iobuffer    {$$ = $1;}
+                | struct_node {$$ = $1;}
+                | vertex {$$ = $1;}
+                | routine_node SEMICOLON {$$=$1;}
+                | pixel {$$ = $1;}
+                ;
+
+block           : OPEN_BRACE CLOSE_BRACE {$$ = driver->createBlock();}
+                | OPEN_BRACE stmts CLOSE_BRACE {$$ = driver->createBlock(); $$->instructions = *$2;}
+                ;
+
+stmts           : stmt { $$ = new std::vector<HISL::PTStatement*>(); $$->push_back($1);}
+                | stmts stmt {$1->push_back($2);}
+                ;
+
+stmt            : expr_stmt {$$ = $1;}
+                | g_var_dcl SEMICOLON{ }
+                | g_arr_dcl SEMICOLON{ }
+                | BUILTIN_VAR EQL expression SEMICOLON {$$ = driver->createConfigStatement(driver->createId(*$1),$3);}
+                ;
+
+expr_stmt       : expression SEMICOLON {$$ = driver->createExpressionStmt($1);}
+                ;
+
+expression      : assignment {$$ = $1;}
+                | lvalue {$$ = $1;}
+                | int_num {$$ = $1;}
+                | float_num {$$ = $1;}
+                | expression binary_op expression {$$ = driver->createBinaryExp($1,$2,$3);}
+                | unary_expr {$$ = $1;}
+                | func_call {$$ = $1;}
+                | type_constructor {$$ = $1;}
+                | OPEN_PAREN expression CLOSE_PAREN {$$ = $2;}
+                ;
+
+func_call       : access_chain OPEN_PAREN args CLOSE_PAREN {$$ = driver->createFunctionCall(driver->createAccessChain($1),$3);}
+                ;
+
+args            : {$$ = new std::vector<HISL::PTExpression*>();}
+                | expression {$$ = new std::vector<HISL::PTExpression*>(); $$->push_back($1);}
+                | args COMMA expression {$1->push_back($3);}
+                ;
+
+unary_expr      : NOT expression {$$ = driver->createUnaryExp(new std::string("!"),$2,false);}
+                | INC expression {$$ = driver->createUnaryExp(new std::string("++"),$2,false);}
+                | DEC expression {$$ = driver->createUnaryExp(new std::string("--"),$2,false);}
+                | MUL expression {$$ = driver->createUnaryExp(new std::string("*"),$2,false);}
+                | expression INC {$$ = driver->createUnaryExp(new std::string("++"),$1,true);}
+                | expression DEC {$$ = driver->createUnaryExp(new std::string("--"),$1,true);}
+                ;
+
+binary_op       : PLUS {$$ = new std::string("+");}
+                | MINUS {$$ = new std::string("-");}
+                | MUL {$$ = new std::string("*");}
+                | DEV {$$ = new std::string("/");}
+                | MOD {$$ = new std::string("%");}
+                | LEQL {$$ = new std::string("<=");}
+                | GEQL {$$ = new std::string(">=");}
+                | QEQL {$$ = new std::string("==");}
+                | NOT_EQL {$$ = new std::string("!=");}
+                | AND {$$ = new std::string("&&");}
+                | OR {$$ = new std::string("||");}
+                ;
+
+assignment      : lvalue EQL expression { $$ = driver->createAssignment($1,"=",$3);}
+                | lvalue PLUS_EQL expression {$$ = driver->createAssignment($1,"+=",$3);}
+                | lvalue MINUS_EQL expression {$$ = driver->createAssignment($1,"-=",$3);}
+                | lvalue DEV_EQL expression {$$ = driver->createAssignment($1,"/=",$3);}
+                | lvalue MUL_EQL expression {$$ = driver->createAssignment($1,"*=",$3);}
+                | lvalue MOD_EQL expression {$$ = driver->createAssignment($1,"%=",$3);}
+                ;
+
+lvalue          : access_chain {$$ = driver->createAccessChain($1);}
+                ;
+
+access_chain    : ID {$$ = driver->createVarCall($1);}
+                | arr_access {$$ = $1;}
+                | access_chain DOT ID {
+                  auto chainNode = $1;
+                  while(chainNode != NULL){
+                    if(chainNode->next == NULL)
+                      break;
+                    chainNode = chainNode->next;
+                  }
+                  chainNode->next = driver->createVarCall($3,".");
+                }
+                | access_chain ARROW ID {
+                  auto chainNode = $1;
+                  while(chainNode != NULL){
+                    if(chainNode->next == NULL)
+                      break;
+                    chainNode = chainNode->next;
+                  }
+                  chainNode->next = driver->createVarCall($3,"->");
+                }
+                | access_chain DOT arr_access {
+                  auto chainNode = $1;
+                  while(chainNode != NULL){
+                    if(chainNode->next == NULL)
+                      break;
+                    chainNode = chainNode->next;
+                  }
+
+                  $3->op = "."; chainNode->next = $3;
+                }
+                | access_chain ARROW arr_access {
+                  auto chainNode = $1;
+                  while(chainNode != NULL){
+                    if(chainNode->next == NULL)
+                      break;
+                    chainNode = chainNode->next;
+                  }
+
+                  $3->op = "->"; chainNode->next = $3;
+                }
+                ;
+
+arr_access      : ID OPEN_BRACKET expression CLOSE_BRACKET {$$ = driver->createArrayCall(driver->createId(*$1),$3);}
+                ;
+
+buffer_block    : OPEN_BRACE CLOSE_BRACE {$$ = new std::vector<HISL::PTSemanticVariable>();}
+                | OPEN_BRACE buffer_stmts CLOSE_BRACE {$$ = $2;}
+                ;
+
+buffer_stmts    : semantic_variable SEMICOLON {$$ = new std::vector<HISL::PTSemanticVariable>(); $$->push_back(*$1);}
+                | buffer_stmts semantic_variable SEMICOLON {$1->push_back(*$2);}
+                ;
+
+semantic_variable : variable_spec ID COLON ID {$$ = driver->createSemanticVar($1,driver->createId(*$2),driver->createId(*$4));}
+                  ;
+
+g_var_dcl       : variable_spec g_id_list {$$ = driver->createVarDcl($1,$2);}
+                ;
+
+g_arr_dcl       : variable_spec ID OPEN_BRACKET int_num CLOSE_BRACKET {$$ = driver->createArrayDcl($1,*$2,$4);}
+
+g_id_list       : ID {$$ = new HISL::PTVariableList(); $$->ids.push_back((HISL::PTId*)driver->createId(*$1)); $$->values.push_back(NULL);}
+                | ID EQL expression {$$ = new HISL::PTVariableList(); $$->ids.push_back((HISL::PTId*)driver->createId(*$1)); $$->values.push_back($3);}
+                | g_id_list COMMA ID {$1->ids.push_back((HISL::PTId*)driver->createId(*$3)); $1->values.push_back(NULL);}
+                | g_id_list COMMA ID EQL expression {$1->ids.push_back((HISL::PTId*)driver->createId(*$3)); $1->values.push_back($5);}
+
+variable_dcl    : variable_spec id_list {$$ = driver->createVarDcl($1,$2);}
+                ;
+
+id_list         : ID {$$ = new HISL::PTVariableList(); $$->ids.push_back((HISL::PTId*)driver->createId(*$1)); $$->values.push_back(NULL);}
+                | id_list COMMA ID {$1->ids.push_back((HISL::PTId*)driver->createId(*$3)); $1->values.push_back(NULL);}
+                ;
+
+variable_spec   : TYPE {$$ = driver->createType(*$1);}
+                | ID {$$ = driver->createType(*$1);}
+                ;
+
+int_num         : INTEGER {$$ = driver->createInteger(*$1);}
+                ;
+
+float_num       : FLOAT {$$ = driver->createFloat(*$1);}
+                ;
+
+%%
+
+void yyerror(std::string e){
+  std::cerr<<e<<" at line: "<<*driver->m_location<<std::endl;
+  exit(1);
+}
+
+void report(std::string e){
+  std::cerr<<e<<std::endl;
+}
