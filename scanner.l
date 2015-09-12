@@ -9,21 +9,31 @@
 	#define COL(Col) driver->m_location->columns(Col)
 	#define LINE(Line) driver->m_location->lines(Line)
 	#define SAVE_TOKEN yylval.value = new std::string (yytext,yyleng)
+	
+	std::string* consumeString();
+	void comment();
+	void yyerror(std::string e);
 %}
 %option noyywrap
+%option nounistd
+%option never-interactive
 
 D [0-9]
 L [a-zA-z_]
 
 %%
 %{
-	STEP();
+	//STEP();
 %}
 
 [\n\r]+ {LINE(yyleng);}
 [ \t]+  {STEP();}
 
+(["])					{yylval.value = consumeString(); return STRING;}
 "//".*					{}
+"/*"					{comment();}
+"GLSL"					{return GLSL;}
+"HLSL"					{return HLSL;}
 "int"					{SAVE_TOKEN; return TYPE;}
 "float"					{SAVE_TOKEN; return TYPE;}
 "bool"					{SAVE_TOKEN; return TYPE;}
@@ -34,7 +44,8 @@ L [a-zA-z_]
 "mat3"					{SAVE_TOKEN; return TYPE;}
 "mat4"					{SAVE_TOKEN; return TYPE;}
 "texture2D"				{SAVE_TOKEN; return TYPE;}
-"if"					{}
+"if"					{return IF;}
+"else"					{return ELSE;}
 "struct"				{return STRUCT;}
 "routine"				{return ROUTINE;}
 "vertex"				{return VERTEX;}
@@ -42,8 +53,9 @@ L [a-zA-z_]
 "program"				{return PROGRAM;}
 "iobuffer"				{return IOBUFFER;}
 "uniform"				{return UNIFORM;}
-"while"					{}
-"for"					{}
+"while"					{return WHILE;}
+"for"					{return FOR;}
+"return"				{return RETURN;}
 "->"					{return ARROW;}
 "++"					{return INC;}
 "--"					{return DEC;}
@@ -81,6 +93,38 @@ L [a-zA-z_]
 [a-zA-Z][a-zA-Z0-9_]*	{SAVE_TOKEN; return ID;}
 . 						{yyterminate();}
 %%
+
+std::string* consumeString(){
+	std::string *str = new std::string();
+	
+	int x;
+	while((x = yyinput()) != 0){
+		if(x=='"')
+			return str;
+		if(x == 0)
+			break;
+			
+		str->push_back((char)x);
+	}
+	yyerror("string object didn't close properly");
+	return NULL;
+} 
+void comment(){
+	int c;
+	
+	while((c = yyinput()) != 0){
+		if(c == '*'){
+			while((c=yyinput()) == '*');
+			
+			if(c=='/')
+				return;
+			
+			if(c==0)
+				break;
+		}
+	}
+	yyerror("unterminated comment");
+}
 
 void switchBuffer(const char* bfr){
 	int len = strlen(bfr);

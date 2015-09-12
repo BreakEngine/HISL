@@ -10,12 +10,18 @@ extern int yyparse();
 extern void switchBuffer(const char* bfr);
 extern void terminateBuffer();
 
+
+std::string Driver::m_compiled_vs = "";
+std::string Driver::m_compiled_ps = "";
+ProgramInfo Driver::m_program_info = ProgramInfo();
+
 Driver::Driver():m_location(new location)
 {
 	m_test = -12;
 	m_PTroot = new PTNode();
 	m_PTroot->m_parent = NULL;
 	m_PTroot->m_type = PType::NONE;
+	m_PTroot->m_env = NULL;
 	m_std = new PTNode();
 	m_std->m_parent = NULL;
 	m_std->m_type = PType::NONE;
@@ -38,6 +44,11 @@ void Driver::reset(){
 int Driver::parse(compilerConfig* config){
 	if(config->fromFile){
 		std::string compilestr = read(config->fileName);
+		switchBuffer(compilestr.c_str());
+		yyparse();
+		terminateBuffer();
+	}else if(config->code.size()>0){
+		std::string compilestr = config->code;
 		switchBuffer(compilestr.c_str());
 		yyparse();
 		terminateBuffer();
@@ -74,6 +85,11 @@ void Driver::correctTree(){
 void Driver::semanticAnalysis(){
 	for(int i=0;i<m_PTroot->m_children.size();i++)
 		m_PTroot->m_children[i]->semanticAnalysis(m_dictionary);
+}
+
+void Driver::typeGuard(){
+	for(int i=0;i<m_PTroot->m_children.size();i++)
+		m_PTroot->m_children[i]->typeGuard();
 }
 
 void Driver::handleMultiplication(){
@@ -152,12 +168,15 @@ PTVariableDeclaration* Driver::createVarDcl(PTNode* type, PTNode* idList){
 
 	auto ctype = (PTType*)type;
 	assert(ctype != NULL, "invalid type",m_location);
-	auto cidlst = (PTVariableList*)idList;
-	assert(cidlst != NULL, "invalid identifiers", m_location);
-	cidlst->m_env = new Env();
-	cidlst->type = *ctype;
+	PTVariableList* cidlst = NULL;
+	if(idList){
+		cidlst = (PTVariableList*)idList;
+		assert(cidlst != NULL, "invalid identifiers", m_location);
+		cidlst->m_env = new Env();
+		cidlst->type = *ctype;
+	}
 	res->type = *ctype;
-	res->variables = *cidlst;
+	res->variables = cidlst;
 
 	res->m_env = new Env();
 	return res;
@@ -367,6 +386,7 @@ PTVarCall* Driver::createVarCall(std::string* id,std::string op){
 
 	res->m_parent = NULL;
 	res->m_type = PType::VAR_CALL;
+	res->next = NULL;
 
 	res->id = *createId(*id);
 	res->op = op;
@@ -380,6 +400,7 @@ PTArrayDeclaration* Driver::createArrayDcl(PTNode* type,std::string id,PTInt* si
 
 	res->m_parent = NULL;
 	res->m_type = PType::ARRAY_DECLARATION;
+
 
 	res->id = *createId(id);
 	PTType* cType = (PTType*)type;
@@ -462,6 +483,202 @@ PTRoutine* Driver::createRoutine(PTId* id,std::vector<PTConfig*> *data){
 
 	res->m_parent = NULL;
 	res->m_type = PType::ROUTINE;
+	res->m_env = new Env();
+
+	return res;
+}
+
+PTPreQualifier* Driver::createPreQualifier(std::string val){
+	auto res = new PTPreQualifier();
+
+	res->val = val;
+
+	res->m_parent = NULL;
+	res->m_type = PType::PRE_QUALIFIER;
+	res->m_env = new Env();
+
+	return res;
+}
+
+PTPostQualifier* Driver::createPostQualifier(bool isArray,int ix){
+	auto res = new PTPostQualifier();
+
+	res->isArray = isArray;
+	res->size = ix;
+
+	res->m_parent = NULL;
+	res->m_type = PType::POST_QUALIFIER;
+	res->m_env = new Env();
+
+	return res;
+}
+
+PTDeclarator* Driver::createDeclarator(PTPreQualifier* pre, PTId id, PTPostQualifier* post){
+	auto res = new PTDeclarator();
+
+	res->id = id;
+	res->pre = pre;
+	res->post = post;
+
+	res->m_parent = NULL;
+	res->m_type = PType::DECLARATOR;
+	res->m_env = new Env();
+
+	return res;
+}
+
+PTInitDeclarator* Driver::createInitDeclarator(PTDeclarator* decl,std::vector<PTExpression*>* initlist){
+	auto res = new PTInitDeclarator();
+
+	res->declarator = *decl;
+	res->initializer_list = *initlist;
+	
+
+	res->m_parent = NULL;
+	res->m_type = PType::INIT_DECLARATOR;
+	res->m_env = new Env();
+
+	return res;
+}
+
+PTVariableList* Driver::createVariableList(std::vector<PTInitDeclarator*>* list){
+	auto res = new PTVariableList();
+
+	res->dcl_list = *list;
+	
+
+	res->m_parent = NULL;
+	res->m_type = PType::VARIABLE_LIST;
+	res->m_env = new Env();
+
+	return res;
+}
+
+PTRVariableCall* Driver::createRVarCall(std::string id, std::string op){
+	auto res = new PTRVariableCall();
+	
+	res->op = op;
+	res->id.val = id;
+	res->next = NULL;
+	
+	res->m_parent = NULL;
+	res->m_type = PType::VAR_CALL;
+	res->m_env = new Env();
+
+	return res;
+}
+PTRArrayCall* Driver::createRArrayCall(std::string id,PTExpression* index,std::string op){
+	auto res = new PTRArrayCall();
+	
+	res->op = op;
+	res->id.val = id;
+	res->index = index;
+	res->next = NULL;
+	
+	res->m_parent = NULL;
+	res->m_type = PType::ARRAY_CALL;
+	res->m_env = new Env();
+
+	return res;
+}
+
+PTRFunctionCall* Driver::createRFunctionCall(std::string id,std::vector<PTExpression*>* args, std::string op){
+	auto res = new PTRFunctionCall();
+	
+	res->op = op;
+	res->id.val = id;
+	res->args = *args;
+	res->next = NULL;
+	
+	res->m_parent = NULL;
+	res->m_type = PType::FUNCTION_CALL;
+	res->m_env = new Env();
+
+	return res;
+}
+PTRAccessChain* Driver::createRAccessChain(PTLValue* lval){
+	auto res = new PTRAccessChain();
+	
+	res->lval = lval;
+	
+	res->m_parent = NULL;
+	res->m_type = PType::ACCESS_CHAIN;
+	res->m_env = new Env();
+
+	return res;
+}
+
+PTReturn* Driver::createReturn(PTExpression* obj){
+	auto res = new PTReturn();
+	
+	res->obj = obj;
+	
+	res->m_parent = NULL;
+	res->m_type = PType::RETURN;
+	res->m_env = new Env();
+
+	return res;
+}
+PTIf* Driver::createIf(PTExpression* condition,PTStatement* if_stmt,PTStatement* else_stmt){
+	auto res = new PTIf();
+	
+	res->condition = condition;
+	res->if_stmt = if_stmt;
+	res->else_stmt = else_stmt;
+	
+	res->m_parent = NULL;
+	res->m_type = PType::IF;
+	res->m_env = new Env();
+
+	return res;
+}
+
+PTFor* Driver::createFor(PTStatement* stmt_1,PTStatement* stmt_2, PTExpression* stmt_3, PTStatement* block){
+	auto res = new PTFor();
+	
+	res->stmt_1 = stmt_1;
+	res->stmt_2 = stmt_2;
+	res->stmt_3 = stmt_3;
+	res->block = block;
+	
+	res->m_parent = NULL;
+	res->m_type = PType::FOR;
+	res->m_env = new Env();
+
+	return res;
+}
+
+PTWhile* Driver::createWhile(PTExpression* condition, PTStatement* block){
+	auto res = new PTWhile();
+	
+	res->condition = condition;
+	res->block = block;
+	
+	res->m_parent = NULL;
+	res->m_type = PType::WHILE;
+	res->m_env = new Env();
+
+	return res;
+}
+
+PTNative* Driver::createGLSL(std::string val){
+	auto res = new PTNative();
+	
+	res->content = val;
+	
+	res->m_parent = NULL;
+	res->m_type = PType::GLSL;
+	res->m_env = new Env();
+
+	return res;
+}
+PTNative* Driver::createHLSL(std::string val){
+	auto res = new PTNative();
+	
+	res->content = val;
+	
+	res->m_parent = NULL;
+	res->m_type = PType::HLSL;
 	res->m_env = new Env();
 
 	return res;

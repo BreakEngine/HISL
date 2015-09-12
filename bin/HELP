@@ -1,0 +1,61 @@
+to use HISL in linux you have to compile the library and install it using this steps
+
+- open terminal and navigate to the HISL folder
+- type "cmake ." -the dot is important-, this will generate a makefile
+- type "make", this will compile the code into libHISL.so
+- now navigate into "bin" folder, you will find the lib and inc folder
+- run "install.sh" file with root privileges, or move inc contents to your include folder and libHISL.so to lib folder
+- you are good to go
+
+HISL has no dependencies other than c++11
+HISL is a shared library you can link to "HISL"
+
+note:
+	if you want the executable version just do the following:
+		-open CMakeLists.txt and uncomment -remove the #- this line
+		"#add_executable(HISLC ${SOURCE_FILES})"
+		-comment the following line -by adding # at the begining- because this is the lib line
+		"add_library(HISL SHARED ${SOURCE_FILES})"
+		
+
+
+#Sample Code
+
+#include <iostream>
+#include <HISL/HISLCompiler.hpp>
+#include <HISL/ProgramInfo.hpp>
+#include <fstream>
+
+using namespace std;
+
+std::string read(std::string path){
+    std::string res;
+    ifstream file;
+    file.open(path);
+    std::string line;
+    while(getline(file,line)){
+        res += line;
+        res += "\n";
+    }
+    file.close();
+    return res;
+}
+
+int main() {
+    std::string file = read("test/example01.hisl");
+    HISL::HISLC compiler;
+    compiler.config(HISL::C_PARAMETER::CODE, file);
+    compiler.config(HISL::C_PARAMETER::LANGUAGE, HISL::C_PARAMETER::GLSL330);
+
+    HISL::C_STATE  res= compiler.compile();
+    HISL::ProgramInfo p_info = compiler.getProgramInfo();
+    if(res != HISL::C_STATE::OK){
+        cout<<compiler.fetch(HISL::C_PARAMETER::WARNING_LOG)<<endl;
+        cout<<compiler.fetch(HISL::C_PARAMETER::ERROR_LOG)<<endl;
+    }else{
+        cout<<compiler.fetch(HISL::C_PARAMETER::VERTEX_SHADER)<<endl;
+        cout<<compiler.fetch(HISL::C_PARAMETER::PIXEL_SHADER)<<endl;
+    }
+    return 0;
+}
+

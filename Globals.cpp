@@ -1,23 +1,31 @@
 #include "Globals.hpp"
 #include "PTree.hpp"
+#include "HISLCompiler.hpp"
+#include "Driver.hpp"
 #include <sstream>
 #include <fstream>
 using namespace HISL;
 using namespace std;
 
+Driver* HISL::driver = new Driver();
+
 void HISL::assert(bool val,std::string msg,location* loc){
 		if(!val)
 		{
-			std::cerr<<"Error: "<<msg<<" at location "<<loc->end<<std::endl;
-			exit(1);
+			stringstream ret;
+			ret<<msg<<" at location "<<loc->end<<std::endl;
+			HISLC::error(ret.str());
+			//exit(1);
 		}
 }
 
 void HISL::assert(bool val,std::string msg){
 		if(!val)
 		{
-			std::cerr<<"Error: "<<msg<<std::endl;
-			exit(1);
+			stringstream ret;
+			ret<<msg<<std::endl;
+			HISLC::error(ret.str());
+			//exit(1);
 		}
 }
 
@@ -50,3 +58,4 @@ void HISL::write(std::string path,std::string data){
 	file<<data;
 	file.close();
 }
+

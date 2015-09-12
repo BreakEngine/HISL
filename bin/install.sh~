@@ -1,0 +1,3 @@
+cp -i libHISL.so /usr/lib
+mkdir -p /usr/include/Break
+cp -i inc/*.* /usr/include/HISL
